@@ -37,6 +37,7 @@ Route.group({ prefix: "/v1" }, () => {
     // category routes----------------------------------start
     Route.group({ prefix: "/categories" }, () => {
         Route.get(`/`, CategoryController.index);
+        Route.get(`/:id`, CategoryController.show);
         Route.post(`/`, CategoryController.create);
         Route.patch(`/:id`, CategoryController.update);
         Route.delete(`/:id`, CategoryController.destroy)
@@ -44,6 +45,7 @@ Route.group({ prefix: "/v1" }, () => {
     // brand routes----------------------------------start
     Route.group({ prefix: "/brand" }, () => {
         Route.get(`/`, BrandController.index);
+        Route.get(`/:id`, BrandController.show);
         Route.post(`/`, BrandController.create);
         Route.patch(`/:id`, BrandController.update);
         Route.delete(`/:id`, BrandController.destroy)

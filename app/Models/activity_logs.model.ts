@@ -1,5 +1,5 @@
 import { baseModel } from "./model.js";
 
 export class ActivityLogsModel extends baseModel {
-    protected tableName: string = "users";
+    static tableName: string = "activity_logs";
 }

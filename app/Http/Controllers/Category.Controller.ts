@@ -6,6 +6,7 @@ import { Category } from "../../../@types/table.js";
 
 import Controller from "./Controller.js";
 import { CategoryModel } from "../../Models/categorys.model.js";
+import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
 
 import { _error, _success } from "../../helpers/appHelper.js";
 import STATUS from "../../../config/status.js";
@@ -134,7 +135,8 @@ export default new (class CategoryController extends Controller {
      * 2. Generate a unique slug.
      * 3. Check for duplicate slug.
      * 4. Insert the category.
-     * 5. Return the newly created category.
+     * 5. Create activity log.
+     * 6. Return the newly created category.
      */
     create = async (req: Req<Category>, res: Res) => {
         try {
@@ -208,6 +210,19 @@ export default new (class CategoryController extends Controller {
                 .table()
                 .where("id", insertedId)
                 .first();
+
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    action: "created",
+                    subject_type: "Category",
+                    subject_id: insertedId,
+                    description: `Category "${cleanName}" created`,
+                    new_values: JSON.stringify(category),
+                });
 
             return res
                 .status(STATUS.CREATED)
@@ -357,6 +372,20 @@ export default new (class CategoryController extends Controller {
                 .where("id", id)
                 .first();
 
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    action: "updated",
+                    subject_type: "Category",
+                    subject_id: id,
+                    description: `Category "${updatedCategory?.name}" updated`,
+                    old_values: JSON.stringify(category),
+                    new_values: JSON.stringify(updatedCategory),
+                });
+
             return res
                 .status(STATUS.OK)
                 .json(
@@ -454,6 +483,19 @@ export default new (class CategoryController extends Controller {
                 .table()
                 .where("id", id)
                 .delete();
+
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    action: "deleted",
+                    subject_type: "Category",
+                    subject_id: id,
+                    description: `Category "${category.name}" deleted`,
+                    old_values: JSON.stringify(category),
+                });
 
             return res
                 .status(STATUS.OK)

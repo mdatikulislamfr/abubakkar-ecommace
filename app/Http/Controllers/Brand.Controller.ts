@@ -8,6 +8,7 @@ import Controller from "./Controller.js";
 import { _error, _success } from "../../helpers/appHelper.js";
 import STATUS from "../../../config/status.js";
 import { BrandModel } from "../../Models/brand.model.js";
+import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
 
 export default new (class BrandController extends Controller {
 
@@ -135,7 +136,8 @@ export default new (class BrandController extends Controller {
      * 2. Generate a unique slug.
      * 3. Check for duplicate slug.
      * 4. Insert the brand.
-     * 5. Return the newly created brand.
+     * 5. Create activity log.
+     * 6. Return the newly created brand.
      */
     create = async (req: Req<Brand>, res: Res) => {
         try {
@@ -149,7 +151,15 @@ export default new (class BrandController extends Controller {
                 status,
             } = req.body;
 
-            if (!name?.trim() || !description?.trim() || !website) {
+            if (
+                !name?.trim() ||
+                !description?.trim() ||
+                !website ||
+                !code ||
+                !logo ||
+                !sort_order ||
+                !status
+            ) {
                 return res
                     .status(STATUS.BAD_REQUEST)
                     .json(
@@ -212,6 +222,23 @@ export default new (class BrandController extends Controller {
                 .table()
                 .where("id", insertedId)
                 .first();
+
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    user_id: req.user?.id ?? null,
+                    action: "created",
+                    subject_type: "Brand",
+                    subject_id: insertedId,
+                    description: `Brand "${cleanName}" created successfully`,
+                    old_values: null,
+                    new_values: JSON.stringify(brand),
+                    ip_address: req.ip,
+                    user_agent: req.get("user-agent") ?? null,
+                });
 
             return res
                 .status(STATUS.CREATED)
@@ -367,6 +394,23 @@ export default new (class BrandController extends Controller {
                 .where("id", id)
                 .first();
 
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    user_id: req.user?.id ?? null,
+                    action: "updated",
+                    subject_type: "Brand",
+                    subject_id: id,
+                    description: `Brand "${updatedBrand?.name}" updated successfully`,
+                    old_values: JSON.stringify(brand),
+                    new_values: JSON.stringify(updatedBrand),
+                    ip_address: req.ip,
+                    user_agent: req.get("user-agent") ?? null,
+                });
+
             return res
                 .status(STATUS.OK)
                 .json(
@@ -397,7 +441,7 @@ export default new (class BrandController extends Controller {
      * A brand should not be deleted when:
      * - It is already being used by products.
      */
-    destroy = async (req: Request, res: Response) => {
+    destroy = async (req: Req<{ id: string }>, res: Response) => {
         try {
             const { id } = req.params;
 
@@ -446,6 +490,23 @@ export default new (class BrandController extends Controller {
                 .update({
                     deleted_at: new Date(),
                     updated_at: new Date(),
+                });
+
+            /**
+             * Create activity log.
+             */
+            await ActivityLogsModel
+                .table()
+                .insert({
+                    user_id: req.user?.id ?? null,
+                    action: "deleted",
+                    subject_type: "Brand",
+                    subject_id: id,
+                    description: `Brand "${brand.name}" deleted successfully`,
+                    old_values: JSON.stringify(brand),
+                    new_values: null,
+                    ip_address: req.ip,
+                    user_agent: req.get("user-agent") ?? null,
                 });
 
             return res

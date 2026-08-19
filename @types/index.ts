@@ -8,7 +8,15 @@ export interface ResponceType<T> {
 }
 
 // custom request 
-export interface Req<T> extends Request { body: T }
+export interface Req<T> extends Request {
+    user?: {
+        name?: string,
+        id: number,
+        token: string
+    },
+    body: T
+
+}
 export interface Res extends Response {
     name?: string,
 };
