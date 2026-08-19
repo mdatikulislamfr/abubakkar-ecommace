@@ -1,0 +1,32 @@
+আমি তোমাকে আমার existing Controller এবং Model code দেব।
+
+তুমি আমার code-এর architecture, coding style, naming convention, structure এবং logic pattern ভালোভাবে follow করবে।
+
+IMPORTANT RULES:
+
+1. আমার existing code-এর style পরিবর্তন করবে না।
+2. নিজের মতো নতুন architecture, pattern বা unnecessary abstraction ব্যবহার করবে না।
+3. আমি যে Controller pattern ব্যবহার করি, নতুন Controller-এ একই pattern follow করবে।
+4. আমি যে Model pattern ব্যবহার করি, নতুন Model-এ একই pattern follow করবে।
+5. Existing import style, class structure, method naming এবং response structure maintain করবে।
+6. আমার existing helper, STATUS, Req, Res, Model.table() ইত্যাদি যেভাবে ব্যবহার করেছি, সেভাবেই ব্যবহার করবে।
+7. Validation → slug generation → duplicate check → database operation → response এই ধরনের existing flow থাকলে সেটাই follow করবে।
+8. Update method-এ আমার existing PATCH-style update pattern follow করবে।
+9. Delete করার আগে existing dependency/relationship check থাকলে একইভাবে implement করবে।
+10. try/catch এবং error handling আমার existing code-এর মতো রাখবে।
+11. _success() এবং _error() response format পরিবর্তন করবে না।
+12. HTTP STATUS constants-এর existing usage maintain করবে।
+13. Comments এবং documentation আমার existing code-এর style অনুযায়ী রাখবে।
+14. Variable এবং method-এর নাম অপ্রয়োজনে পরিবর্তন করবে না।
+15. Database field/model-এর নাম আমার দেওয়া Model/Table/Type অনুযায়ী ব্যবহার করবে।
+16. আমার code-এ কোনো বিষয় পরিষ্কারভাবে দেওয়া থাকলে নিজের assumption দিয়ে সেটা replace করবে না।
+17. কোনো নতুন feature আমি না চাইলে add করবে না।
+18. Code সুন্দর, clean, readable এবং production-ready করবে, কিন্তু আমার মূল coding style পরিবর্তন করবে না।
+19. নতুন Controller/Model বানানোর আগে আমি যে existing code দেব, সেটাকেই primary reference হিসেবে ধরবে।
+20. যদি নতুন entity হয়, শুধু entity-specific অংশগুলো পরিবর্তন করবে; মূল structure এবং pattern একই রাখবে।
+
+আমি প্রথমে আমার existing Controller এবং Model code দেব।
+সেগুলো analyze করে একই coding pattern অনুসরণ করে আমি যে নতুন Controller/Model চাইব সেটা তৈরি করবে।
+
+সবচেয়ে গুরুত্বপূর্ণ:
+"আমার code-এর style follow করবে, নিজের style impose করবে না।"

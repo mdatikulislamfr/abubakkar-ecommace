@@ -1,0 +1,75 @@
+{
+   "compilerOptions": {
+      /* ================================
+       Environment
+    ================================= */
+      "target": "esnext",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      /* ================================
+       Source & Output
+    ================================= */
+      "rootDir": ".",
+      "outDir": "./dist",
+      /* ================================
+       TypeScript Strictness
+    ================================= */
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "strictFunctionTypes": true,
+      "strictBindCallApply": true,
+      "strictPropertyInitialization": true,
+      "noImplicitThis": true,
+      "useUnknownInCatchVariables": true,
+      /* ================================
+       JavaScript Interop
+    ================================= */
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      /* ================================
+       Code Quality
+    ================================= */
+      "forceConsistentCasingInFileNames": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      /* ================================
+       Type Definitions
+    ================================= */
+      "types": [
+         "node"
+      ],
+      /* ================================
+       Source Maps
+    ================================= */
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+      /* ================================
+       JSON
+    ================================= */
+      "resolveJsonModule": true,
+      /* ================================
+       Performance
+    ================================= */
+      "skipLibCheck": true
+   },
+   "include": [
+      "app/**/*.ts",
+      "bootstrap/**/*.ts",
+      "config/**/*.ts",
+      "database/**/*.ts",
+      "routes/**/*.ts",
+      "src/**/*.ts",
+      "@types/**/*.ts"
+   ],
+   "exclude": [
+      "node_modules",
+      "dist",
+      "storage",
+      "public",
+      "tests"
+   ]
+}
