@@ -1,230 +1,214 @@
+import { Request, Response } from "express";
+import { Product } from "../../../@types/table.js";
+import STATUS from "../../../config/status.js";
+import generateBarcode from "../../helpers/generateBarcode.js";
+import { BrandModel } from "../../Models/brand.model.js";
+import { CategoryModel } from "../../Models/categorys.model.js";
+import { ProductModel } from "../../Models/products.model.js";
 import Controller from "./Controller.js";
-
+import slugify from 'slugify'
 
 export default new class ProductController extends Controller {
-    products = [
-        {
-            id: 1,
-            slug: "smartphone-x-pro",
-            name: "স্মার্টফোন এক্স প্রো",
-            description: "প্রিমিয়াম মানের পণ্য, সেরা দামে।",
-            specification: [
-                "৫জি সাপোর্ট",
-                "১২৮ গিগাবাইট স্টোরেজ",
-                "৬৪ মেগাপিক্সেল ক্যামেরা"
-            ],
-            price: 124440,
-            oldPrice: 29990,
-            discount: Math.floor(((29990 - 24990) / 29990) * 100),
-            categoryId: 1,
-            categoryName: "ইলেকট্রনিক্স",
-            images: [
-                "https://picsum.photos/seed/smartphone-x-pro-1/800/800",
-                "https://picsum.photos/seed/smartphone-x-pro-2/800/800"
-            ],
-            rating: 4.6,
-            reviewCount: 24,
-            stock: 15,
-            brand: "TechPro",
-            featured: true,
-            bestSelling: true,
-            newArrival: false,
-            createdAt: new Date(Date.now() - 7 * 86400000).toISOString()
-        },
-        {
-            id: 2,
-            slug: "wireless-earbuds",
-            name: "ওয়্যারলেস ইয়ারবাডস",
-            description: "নয়েজ ক্যানসেলিং হেডফোন",
-            specification: [
-                "ব্লুটুথ ৫.৩",
-                "২৪ঘন্টা ব্যাটারি",
-                "IPX5 ওয়াটার রেজিস্ট্যান্ট"
-            ],
-            price: 1890,
-            oldPrice: 2990,
-            discount: Math.floor(((2990 - 1890) / 2990) * 100),
-            categoryId: 1,
-            categoryName: "ইলেকট্রনিক্স",
-            images: [
-                "https://picsum.photos/seed/wireless-earbuds-1/800/800",
-                "https://picsum.photos/seed/wireless-earbuds-2/800/800"
-            ],
-            rating: 4.5,
-            reviewCount: 55,
-            stock: 30,
-            brand: "SoundMax",
-            featured: true,
-            bestSelling: false,
-            newArrival: true,
-            createdAt: new Date(Date.now() - 3 * 86400000).toISOString()
-        },
-        {
-            id: 3,
-            slug: "laptop-air-slim",
-            name: "ল্যাপটপ এয়ার স্লিম",
-            description: "লাইটওয়েট ল্যাপটপ নিয়মিত কাজের জন্য",
-            specification: [
-                "M2 চিপ",
-                "৮ গিগাবাইট র্যাম",
-                "২৫৬ জিবি SSD"
-            ],
-            price: 68900,
-            oldPrice: 74990,
-            discount: Math.floor(((74990 - 68900) / 74990) * 100),
-            categoryId: 1,
-            categoryName: "ইলেকট্রনিক্স",
-            images: [
-                "https://picsum.photos/seed/laptop-air-slim-1/800/800",
-                "https://picsum.photos/seed/laptop-air-slim-2/800/800"
-            ],
-            rating: 4.7,
-            reviewCount: 8,
-            stock: 5,
-            brand: "TechPro",
-            featured: true,
-            bestSelling: false,
-            newArrival: false,
-            createdAt: new Date(Date.now() - 14 * 86400000).toISOString()
-        },
-         {
-            id: 4,
-            slug: "laptop-air-slim",
-            name: "ল্যাপটপ এয়ার স্লিম",
-            description: "লাইটওয়েট ল্যাপটপ নিয়মিত কাজের জন্য",
-            specification: [
-                "M2 চিপ",
-                "৮ গিগাবাইট র্যাম",
-                "২৫৬ জিবি SSD"
-            ],
-            price: 68900,
-            oldPrice: 74990,
-            discount: Math.floor(((74990 - 68900) / 74990) * 100),
-            categoryId: 1,
-            categoryName: "ইলেকট্রনিক্স",
-            images: [
-                "https://picsum.photos/seed/laptop-air-slim-1/800/800",
-                "https://picsum.photos/seed/laptop-air-slim-2/800/800"
-            ],
-            rating: 4.7,
-            reviewCount: 8,
-            stock: 5,
-            brand: "TechPro",
-            featured: true,
-            bestSelling: false,
-            newArrival: false,
-            createdAt: new Date(Date.now() - 14 * 86400000).toISOString()
-        }
-    ];
 
-    index = async (req, res) => {
+    index = async (req: Request<{ id?: string, slug?: string }>, res: Response) => {
         try {
-            return res.json(this._success("পণ্য তালিকা সফলভাবে পৈদা হয়েছে", this.products));
+            const id = req.params.id || req.query.id;
+            const slug = req.params.slug || req.query.slug;
+            const start = performance.now();
+            const products: Product[] = await ProductModel.table()
+                .join("categories", "products.category_id", "categories.id")
+                .join("brands", "products.brand_id", "brands.id")
+                .select([
+                    "products.*",
+                    // brand
+                    "brands.name as brand_name",
+                    "brands.slug as brand_slug",
+                    "brands.description as brand_description",
+                    "brands.logo as brand_logo",
+                    // category
+                    "categories.name as categorie_name",
+                    "categories.slug as categorie_slug",
+                    "categories.description as categorie_description",
+                    "categories.image as categorie_logo",
+
+                ])
+                .modify((query) => {
+                    if (id) {
+                        return query.where("products.id", "=", id.toString()).first();
+                    }
+                    if (slug) {
+                        return query.where("products.slug", "=", slug.toString()).first();
+                    }
+                    return query;
+                })
+                .where("products.deleted_at", null)
+                .orderBy("products.id", "desc");
+            const end = performance.now();
+            if (!products) {
+                    return res._error(STATUS.NOT_FOUND, "Product not found!");
+            }
+            return res._success(STATUS.OK, `product list ${(end - start).toFixed(2)}ms`, products);
         } catch (error) {
-            return res.status(500).json(this._error("কিছু সমস্যা হয়েছে", { error: error.message }));
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "some error");
         }
     }
-
-    show = async (req, res) => {
+    barcode = async (req: Request<{ text?: string }>, res: Response) => {
         try {
-            const product = this.products.find(p => p.id === req.params.id);
+            const { text } = req.params;
+            res.set({
+                "Content-Type": "image/png",
+                "Cross-Origin-Resource-Policy": "cross-origin",
+                "Access-Control-Allow-Origin": "*",
+            });
+            const buffer = await generateBarcode(text?.toString() || "");
+            return res.send(buffer)
+        } catch (error) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
+        }
+    }
+    create = async (req: Request, res: Response) => {
+        try {
+            const product = req.body as Product;
+            const slug = slugify(product.slug.trim(), {
+                lower: true,
+                trim: true,
+            });
+            // check slug
+            const haveSlug = await ProductModel.table().where("slug", "=", slug).first();
+            if (haveSlug) return res._error(STATUS.CONFLICT, `${slug} alredy have!`);
+            // check category
+            const haveCategory = await CategoryModel.table().where("id", product.category_id).first();
+            if (!haveCategory) return res._error(STATUS.NOT_FOUND, "Category not found!");
+            // check brnad
+            const haveBrand = await BrandModel.table().where("id", product.brand_id).first();
+            if (!haveBrand) return res._error(STATUS.NOT_FOUND, "Brand not found!");
+
+            // new product model
+            const newProduct: Product = {
+                ...product,
+                slug,
+                barcode: product.sku,
+
+            }
+            // insert product with database
+            const [insertId] = await ProductModel.table().insert(newProduct);
+            const newdata = await ProductModel.find(insertId) as Product;
+            return res._success(STATUS.CREATED, "success data", newdata);
+        } catch (error) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
+        }
+    }
+    update = async (req: Request<{ id?: string }, "", Partial<Product>>, res: Response) => {
+        try {
+            const { id } = req.params;
+
+            // check product
+            const product = await ProductModel
+                .table()
+                .where("id", Number(id))
+                .first();
+
             if (!product) {
-                return res.status(404).json(this._error("পণ্য খুঁজে পাওয়া যায়নি"));
-            }
-            return res.json(this._success("পণ্যের বিস্তারিত", product));
-        } catch (error) {
-            return res.status(500).json(this._error("কিছু সমস্যা হয়েছে", { error: error.message }));
-        }
-    }
-
-    create = async (req, res) => {
-        try {
-            const { name, price, description, specification, categoryId, categoryName, images, rating, stock, brand } = req.body;
-
-            if (!name || !price || !description) {
-                return res.status(400).json(this._error("নাম, দাম এবং বিবরণ দিন"));
+                return res._error(STATUS.NOT_FOUND, "Product not found!");
             }
 
-            const newProduct = {
-                id: req.body.id || `p-${Date.now()}`,
-                slug: req.body.slug || `p-${Date.now()}`,
-                name,
-                description,
-                specification: specification || [],
-                price: Number(price),
-                oldPrice: req.body.oldPrice ? Number(req.body.oldPrice) : undefined,
-                discount: req.body.oldPrice ? Math.floor(((Number(req.body.oldPrice) - Number(price)) / Number(req.body.oldPrice)) * 100) : undefined,
-                categoryId: categoryId || "",
-                categoryName: categoryName || "",
-                images: images || [],
-                rating: Number(rating) || 0,
-                reviewCount: Number(req.body.reviewCount) || 0,
-                stock: Number(stock) || 0,
-                brand: brand || undefined,
-                featured: req.body.featured || false,
-                bestSelling: req.body.bestSelling || false,
-                newArrival: req.body.newArrival || false,
-                createdAt: new Date().toISOString()
+            const data = req.body;
+
+            // check slug
+            if (data.slug !== undefined) {
+                const slug = slugify(data.slug.trim(), {
+                    lower: true,
+                    trim: true,
+                });
+
+                const haveSlug = await ProductModel
+                    .table()
+                    .where("slug", slug)
+                    .whereNot("id", Number(id))
+                    .first();
+
+                if (haveSlug) {
+                    return res._error(STATUS.CONFLICT, `${slug} alredy have!`);
+                }
+
+                data.slug = slug;
+            }
+
+            // check category
+            if (data.category_id !== undefined) {
+                const haveCategory = await CategoryModel
+                    .table()
+                    .where("id", data.category_id)
+                    .first();
+                if (!haveCategory) {
+                    return res._error(STATUS.NOT_FOUND, "Category not found!");
+                }
+            }
+
+            // check brand
+            if (data.brand_id !== undefined) {
+                const haveBrand = await BrandModel
+                    .table()
+                    .where("id", data.brand_id)
+                    .first();
+
+                if (!haveBrand) {
+                    return res._error(STATUS.NOT_FOUND, "Brand not found!");
+                }
+            }
+
+            // update product
+            const updatedProduct = {
+                ...data,
+                updated_at: new Date().toISOString(),
             };
 
-            this.products.push(newProduct);
+            await ProductModel
+                .table()
+                .where("id", Number(id))
+                .update(updatedProduct);
 
-            return res.status(201).json(this._success("পণ্য সফলভাবে যোগ হয়েছে", newProduct));
+            const newdata = await ProductModel.find(Number(id)) as Product;
+
+            return res._success(
+                STATUS.OK,
+                "Product updated successfully!",
+                newdata
+            );
         } catch (error) {
-            return res.status(500).json(this._error("কিছু সমস্যা হয়েছে", { error: error.message }));
+            return res._error(
+                STATUS.INTERNAL_SERVER_ERROR,
+                error instanceof Error
+                    ? error.message
+                    : "server error !"
+            );
         }
-    }
+    };
 
-    update = async (req, res) => {
+    destroy = async (req: Request<{ id?: string }>, res: Response) => {
         try {
             const { id } = req.params;
-            const index = this.products.findIndex(p => p.id === id);
 
-            if (index === -1) {
-                return res.status(404).json(this._error("পণ্য খুঁজে পাওয়া যায়নি"));
-            }
+            // check product
+            const product = await ProductModel.table()
+                .where("id", Number(id))
+                .whereNull("deleted_at")
+                .first();
 
-            const updatableFields = ["name", "description", "specification", "categoryId", "categoryName", "images", "brand", "featured", "bestSelling", "newArrival"];
-            const updated = { ...this.products[index] };
+            if (!product) return res._error(STATUS.NOT_FOUND, "Product not found!");
 
-            updatableFields.forEach(field => {
-                if (req.body[field] !== undefined) {
-                    updated[field] = req.body[field];
-                }
-            });
-
-            if (req.body.price !== undefined) updated.price = Number(req.body.price);
-            if (req.body.oldPrice !== undefined) updated.oldPrice = Number(req.body.oldPrice);
-            if (req.body.stock !== undefined) updated.stock = Number(req.body.stock);
-            if (req.body.rating !== undefined) updated.rating = Number(req.body.rating);
-            if (req.body.reviewCount !== undefined) updated.reviewCount = Number(req.body.reviewCount);
-
-            if (updated.oldPrice && updated.price) {
-                updated.discount = Math.floor(((updated.oldPrice - updated.price) / updated.oldPrice) * 100);
-            }
-
-            this.products[index] = updated;
-
-            return res.json(this._success("পণ্য সফলভাবে আপডেট হয়েছে", updated));
+            // delete product
+            await ProductModel.table()
+                .where("id", Number(id))
+                .update({
+                    deleted_at: new Date(),
+                });
+            return res._success(STATUS.OK, "Product deleted successfully!");
         } catch (error) {
-            return res.status(500).json(this._error("কিছু সমস্যা হয়েছে", { error: error.message }));
+            return res._error(
+                STATUS.INTERNAL_SERVER_ERROR,
+                error instanceof Error ? error.message : "server error !"
+            );
         }
-    }
-
-    destroy = async (req, res) => {
-        try {
-            const { id } = req.params;
-            const index = this.products.findIndex(p => p.id === id);
-
-            if (index === -1) {
-                return res.status(404).json(this._error("পণ্য খুঁজে পাওয়া যায়নি"));
-            }
-
-            this.products.splice(index, 1);
-
-            return res.json(this._success("পণ্য সফলভাবে মুছে ফেলা হয়েছে"));
-        } catch (error) {
-            return res.status(500).json(this._error("কিছু সমস্যা হয়েছে", { error: error.message }));
-        }
-    }
+    };
 }

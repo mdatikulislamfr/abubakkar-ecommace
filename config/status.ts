@@ -1,4 +1,4 @@
-export default {
+const STATUS =  {
     // 2xx Success
     OK: 200,
     CREATED: 201,
@@ -26,4 +26,6 @@ export default {
     BAD_GATEWAY: 502,
     SERVICE_UNAVAILABLE: 503,
     GATEWAY_TIMEOUT: 504,
-};
+} as const;
+
+export default STATUS;

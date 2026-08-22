@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import slugify from "slugify";
 
-import { Req, Res } from "../../../@types/index.js";
 import { Brand } from "../../../@types/table.js";
 
 import Controller from "./Controller.js";
@@ -84,7 +83,7 @@ export default new (class BrandController extends Controller {
     /**
      * Get a single brand by ID.
      */
-    show = async (req: Req<{ id: string }>, res: Response) => {
+    show = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
 
@@ -139,7 +138,7 @@ export default new (class BrandController extends Controller {
      * 5. Create activity log.
      * 6. Return the newly created brand.
      */
-    create = async (req: Req<Brand>, res: Res) => {
+    create = async (req: Request, res: Response) => {
         try {
             const {
                 name,
@@ -270,7 +269,7 @@ export default new (class BrandController extends Controller {
      * PATCH behavior:
      * Only fields provided by the client are updated.
      */
-    update = async (req: Req<Brand>, res: Res) => {
+    update = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
 
@@ -441,7 +440,7 @@ export default new (class BrandController extends Controller {
      * A brand should not be deleted when:
      * - It is already being used by products.
      */
-    destroy = async (req: Req<{ id: string }>, res: Response) => {
+    destroy = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
 

@@ -26,13 +26,14 @@ Route.group({ prefix: "/v1" }, () => {
             Route.get(`refhistory`, UsersController.refhistoy);
         })
     })
-    // product route
-    Route.group({ prefix: "/products" }, () => {
-        Route.get(`/`, ProductController.index);
-        Route.get(`/:id`, ProductController.show);
-        Route.post(``, ProductController.create);
-        Route.patch(`/:id`, ProductController.update);
-        Route.delete(`/:id`, ProductController.destroy);
+
+    // brand routes----------------------------------start
+    Route.group({ prefix: "/brand" }, () => {
+        Route.get(`/`, BrandController.index);
+        Route.get(`/:id`, BrandController.show);
+        Route.post(`/`, BrandController.create);
+        Route.patch(`/:id`, BrandController.update);
+        Route.delete(`/:id`, BrandController.destroy)
     })
     // category routes----------------------------------start
     Route.group({ prefix: "/categories" }, () => {
@@ -42,17 +43,28 @@ Route.group({ prefix: "/v1" }, () => {
         Route.patch(`/:id`, CategoryController.update);
         Route.delete(`/:id`, CategoryController.destroy)
     })
-    // brand routes----------------------------------start
-    Route.group({ prefix: "/brand" }, () => {
-        Route.get(`/`, BrandController.index);
-        Route.get(`/:id`, BrandController.show);
-        Route.post(`/`, BrandController.create);
-        Route.patch(`/:id`, BrandController.update);
-        Route.delete(`/:id`, BrandController.destroy)
+    // product route
+    Route.group({ prefix: "/products" }, () => {
+        Route.get(`/`, ProductController.index);
+        Route.get(`/barcode/:text`, ProductController.barcode);
+        Route.get(`/:id`, ProductController.index);
+        Route.post(`/`, ProductController.create);
+        Route.patch(`/:id`, ProductController.update);
+        Route.delete(`/:id`, ProductController.destroy);
+    })
+    // order routes----------------------------------start
+    Route.group({ prefix: "/order" }, () => {
+        Route.get(`/`, OrderController.index);
+        Route.get(`/:id`, OrderController.index);
+        Route.post(`/`, OrderController.order);
+        // Route.patch(`/:id`, OrderController.update);
+        // Route.delete(`/:id`, OrderController.destroy);
+        Route.get(`/invoice/:id`, OrderController.invoice);
     })
     // app routes----------------------------------start
     Route.group({ prefix: "/app" }, () => {
         Route.get(`/`, AppController.index);
+        Route.patch(`/`, AppController.appset);
         Route.get(`/banners`, AppController.bannaer);
     })
     // app routes----------------------------------end
@@ -61,11 +73,7 @@ Route.group({ prefix: "/v1" }, () => {
         Route.get(`/`, ReviewsController.index);
     })
     // reviews routes----------------------------------end
-    // order routes----------------------------------start
-    Route.group({ prefix: "/order" }, () => {
-        Route.post(`/`, OrderController.order);
-        Route.get(`/invoice/:id`, OrderController.invoice);
-    })
+
     // order routes----------------------------------end
 })
 export default Route.getRouter();

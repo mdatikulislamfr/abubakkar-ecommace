@@ -1,3 +1,39 @@
+
+
+export interface Banner {
+    id?: number;
+    title: string;
+    subtitle?: string;
+    image: string;
+    mobile_image?: string;
+    link?: string;
+    button_text?: string;
+    position?: string;
+    sort_order?: number;
+    status: "active" | "inactive";
+    start_at?: Date | string;
+    end_at?: Date | string;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+}
+export interface App {
+    id?: number;
+    name: string,
+    title: string,
+    insite_dhaka: number,
+    outsite_dhaka: number,
+    email: string,
+    location: string,
+    phone: string,
+    facebook?: string,
+    linkdin?: string,
+    logo?: string,
+    status: boolean,
+    messager?: string,
+    youtube?: string,
+    created_at: Date;
+    updated_at: Date;
+}
 export interface ActivityLog {
     id: number;
     user_id: number | null;
@@ -55,10 +91,10 @@ export interface OrderItem {
     updated_at: Date | string;
 }
 export interface Order {
-    id: number;
-    order_number: string;
-    customer_id: number | null;
-    status:
+    id?: number;
+    order_number?: string;
+    customer_id?: number | null;
+    status?:
     | "pending"
     | "confirmed"
     | "processing"
@@ -66,30 +102,27 @@ export interface Order {
     | "delivered"
     | "cancelled"
     | "returned";
-    payment_status:
+    payment_status?:
     | "pending"
     | "partial"
     | "paid"
     | "failed"
     | "refunded";
-    payment_method: string | null;
-    subtotal: number;
-    discount: number;
-    shipping_charge: number;
-    tax: number;
-    total: number;
-    paid_amount: number;
-    due_amount: number;
+    payment_method?: string | null;
+    subtotal?: number;
+    discount?: number;
+    total?: number;
+    paid_amount?: number;
+    due_amount?: number;
     customer_name: string;
     customer_phone: string;
     shipping_address: string;
-    billing_address: string | null;
     customer_note: string | null;
-    admin_note: string | null;
-    ordered_at: Date | string;
-    created_at: Date | string;
-    updated_at: Date | string;
-    deleted_at: Date | string | null;
+    admin_note?: string | null;
+    ordered_at?: Date | string;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+    deleted_at?: Date | string | null;
 }
 export interface ProductImage {
     id: number;
@@ -105,13 +138,14 @@ export interface ProductImage {
     deleted_at: Date | string | null;
 }
 export interface Product {
-    id: number;
+    id?: number;
     category_id: number;
-    brand_id: number | null;
+    brand_id: number;
     name: string;
     slug: string;
     sku: string;
-    barcode: string | null;
+    barcode?: string | null;
+    barcodeImage?: Buffer;
     description: string | null;
     unit: string;
     purchase_price: number;
@@ -122,9 +156,9 @@ export interface Product {
     min_stock: number;
     status: boolean;
     featured: boolean;
-    created_at: Date | string;
-    updated_at: Date | string;
-    deleted_at: Date | string | null;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+    deleted_at?: Date | string | null;
 }
 
 export interface Review {

@@ -17,6 +17,7 @@ export default {
      * Supported: "development", "production", "testing"
      */
     env: process.env.NODE_ENV || 'development',
+    isProduction: process.env.NODE_ENV !=="development",
 
     /**
      * Server Configuration

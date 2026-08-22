@@ -6,7 +6,7 @@ import { Application } from 'express-application-framework';
 import appConfig from '../config/app.js';
 // Import CORS configuration
 import corsConfig from '../config/cors.js';
-
+import reqMiddleware from '../app/Http/Middleware/req.middleware.js';
 /**
  * Application Entry Point
  * 
@@ -26,6 +26,7 @@ export default Application({
     port: appConfig.server.port,
     cors: corsConfig,
     callback(app) {
+        app.use(reqMiddleware);
         // Mount API routes under /api prefix
         app.use("/api", api);
         // Mount web routes at root path

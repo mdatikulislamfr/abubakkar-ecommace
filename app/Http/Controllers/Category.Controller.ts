@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import slugify from "slugify";
 
-import { Req, Res } from "../../../@types/index.js";
 import { Category } from "../../../@types/table.js";
 
 import Controller from "./Controller.js";
@@ -10,6 +9,8 @@ import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
 
 import { _error, _success } from "../../helpers/appHelper.js";
 import STATUS from "../../../config/status.js";
+import { caseEvent } from "../../Events/index.js";
+import { Case } from "../../../@types/event.js";
 
 export default new (class CategoryController extends Controller {
 
@@ -138,8 +139,9 @@ export default new (class CategoryController extends Controller {
      * 5. Create activity log.
      * 6. Return the newly created category.
      */
-    create = async (req: Req<Category>, res: Res) => {
+    create = async (req: Request, res: Response) => {
         try {
+
             const {
                 parent_id,
                 name,
@@ -147,7 +149,8 @@ export default new (class CategoryController extends Controller {
                 image,
                 sort_order,
                 status,
-            } = req.body;
+                slug
+            } = req.body as Category;
 
             if (!name?.trim()) {
                 return res
@@ -158,24 +161,7 @@ export default new (class CategoryController extends Controller {
                         })
                     );
             }
-
             const cleanName = name.trim();
-
-            const slug = slugify(cleanName, {
-                lower: true,
-                strict: true,
-                trim: true,
-            });
-
-            if (!slug) {
-                return res
-                    .status(STATUS.BAD_REQUEST)
-                    .json(
-                        _error({
-                            message: "Unable to generate category slug",
-                        })
-                    );
-            }
 
             const existing = await CategoryModel
                 .table()
@@ -223,7 +209,11 @@ export default new (class CategoryController extends Controller {
                     description: `Category "${cleanName}" created`,
                     new_values: JSON.stringify(category),
                 });
-
+            caseEvent.emit("case:remove", {
+                section: "REACT_QUERY_OFFLINE_CACHE",
+                message: "create category new item  for update your site",
+                name: req.user?.name || "Admin"
+            } as Case)
             return res
                 .status(STATUS.CREATED)
                 .json(
@@ -254,10 +244,9 @@ export default new (class CategoryController extends Controller {
      * PATCH behavior:
      * Only fields provided by the client are updated.
      */
-    update = async (req: Req<Category>, res: Res) => {
+    update = async (req: Request<{ id?: string }, "", Category>, res: Response) => {
         try {
             const { id } = req.params;
-
             const category = await CategoryModel
                 .table()
                 .where("id", id)
@@ -417,7 +406,7 @@ export default new (class CategoryController extends Controller {
      * - It has child categories.
      * - It is already being used by products.
      */
-    destroy = async (req: Request, res: Response) => {
+    destroy = async (req: Request<{ id?: string }>, res: Response) => {
         try {
             const { id } = req.params;
 

@@ -1,22 +1,38 @@
-import { OrderInformation, Req, Res } from "../../../@types/index.js";
+import { Request, Response } from "express";
 import Controller from "./Controller.js";
+import { Order } from "../../../@types/table.js";
+import STATUS from "../../../config/status.js";
 
 
 export default new class OrdersController extends Controller {
-    order = (req: Req<OrderInformation>, res: Res) => {
+    lastIndex = 0;
+    discount = 10;
+    index = () => {
+
+    }
+    order = (req: Request, res: Response) => {
         try {
-            const { name, address, area, tel, comment, id } = req.body;
-            if (name || address || area || tel || comment || id) {
-                return null;
+            const { customer_name, customer_note, customer_phone, shipping_address } = req.body as Order;
+            if (!customer_name || !customer_note || !customer_phone || !shipping_address) {
+                return res._error(STATUS.CONFLICT, "Customr input empty");
             }
-            return res.status(200).json(this._success("order success", {
-                id: 1
-            }));
+            const total = 100;
+            const neworder: Order = {
+                ...req.body,
+                order_number: `ORD-${Date.now()}-${String(this.lastIndex++).padStart(4, "0")}`,
+                discount: this.discount,
+                due_amount: total,
+                total,
+                subtotal: total - this.discount,
+                payment_method: "case one dealivary",
+                status: "pending",
+            }
+            return res._success(STATUS.OK, "order successfull", neworder);
         } catch (e) {
-            return res.status(500).json(this._error("some error", { error: e.message }));
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some serer error!");
         }
     }
-    invoice = (req, res) => {
+    invoice = (_: Request, res: Response) => {
         try {
             const send = {
                 customar: {
@@ -60,7 +76,7 @@ export default new class OrdersController extends Controller {
             }
             return res.status(200).json(this._success("order success", send));
         } catch (e) {
-            res.status(500).json(this._error("some error", { error: e.message }));
+          return  res.status(500).json(this._error("some error", { error: e instanceof Error? e.message:"some serer errro" }));
         }
     }
 
