@@ -29,7 +29,11 @@ export async function up(knex: Knex): Promise<void> {
             .defaultTo("pending");
 
         table.string("payment_method", 50).nullable();
-
+        table.enum("delivary_area",
+            ["inside", "outside"])
+            .comment("dhaka inside or outside");
+        table.decimal("delivary_charge", 12, 2).notNullable().defaultTo(0.00)
+        
         table.decimal("subtotal", 12, 2).notNullable().defaultTo(0.00);
         table.decimal("discount", 12, 2).notNullable().defaultTo(0.00);
         table.decimal("total", 12, 2).notNullable().defaultTo(0.00);

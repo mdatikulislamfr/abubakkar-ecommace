@@ -148,6 +148,7 @@ export default new (class BrandController extends Controller {
                 website,
                 sort_order,
                 status,
+                slug
             } = req.body;
 
             if (
@@ -157,7 +158,8 @@ export default new (class BrandController extends Controller {
                 !code ||
                 !logo ||
                 !sort_order ||
-                !status
+                !status ||
+                !slug
             ) {
                 return res
                     .status(STATUS.BAD_REQUEST)
@@ -171,25 +173,10 @@ export default new (class BrandController extends Controller {
 
             const cleanName = name.trim();
 
-            const slug = slugify(cleanName, {
-                lower: true,
-                strict: true,
-                trim: true,
-            });
-
-            if (!slug) {
-                return res
-                    .status(STATUS.BAD_REQUEST)
-                    .json(
-                        _error({
-                            message: "Unable to generate brand slug",
-                        })
-                    );
-            }
 
             const existing = await BrandModel
                 .table()
-                .where("slug", slug)
+                .where("slug", slug.trim())
                 .first();
 
             if (existing) {

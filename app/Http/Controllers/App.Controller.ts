@@ -3,16 +3,18 @@ import Controller from "./Controller.js";
 import { AppModel } from "../../Models/app.model.js";
 import status from "../../../config/status.js";
 import { _error, _success } from "../../helpers/appHelper.js";
-import { App } from "../../../@types/table.js";
-import { BannerModel } from "../../Models/banner.model.js";
-import { Req } from "../../../@types/index.js";
 import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
+import appCache from "../../cache/app.cache.js";
+import STATUS from "../../../config/status.js";
 
 
 export default new class AppController extends Controller {
     index = async (_: Request, res: Response) => {
         try {
-            const app = await AppModel.table().first() as App;
+            if (appCache.size() == 0) {
+                await AppModel.cachingOnModel();
+            }
+            const app = appCache.get(0);
             if (!app) {
                 return res.status(status.NOT_FOUND).json(_error({ message: "App data not found" }));
             }
@@ -39,7 +41,7 @@ export default new class AppController extends Controller {
             return res.status(500).json(this._error(e instanceof Error ? e.message : "some error"));
         }
     }
-    appset = async (req: Req<App>, res: Response) => {
+    appset = async (req: Request, res: Response) => {
         try {
             const data = req.body;
             const app = await AppModel
@@ -67,11 +69,8 @@ export default new class AppController extends Controller {
                     ...data,
                     updated_at: new Date(),
                 });
-
-            const updatedApp = await AppModel
-                .table()
-                .where("id", app.id)
-                .first();
+            await AppModel.cachingOnModel();
+            const updatedApp = appCache.get(0);
 
             /**
              * Create activity log.
@@ -96,7 +95,6 @@ export default new class AppController extends Controller {
                     ip_address: req.ip,
                     user_agent: req.get("user-agent") ?? null,
                 });
-
             return res
                 .status(status.OK)
                 .json(
@@ -120,37 +118,53 @@ export default new class AppController extends Controller {
                 );
         }
     };
-    bannaer = (req, res) => {
+    bannaer = (_: Request, res: Response) => {
         try {
             const datas = [
                 {
-                    tag: "নতুন কালেকশন",
-                    title: "স্টাইল বদলান, প্রতিদিন",
-                    subtitle: "সেরা ব্র্যান্ডের ফ্যাশন এখন এক জায়গায়। ৫০% পর্যন্ত ছাড়।",
-                    cta: "কিনতে যান",
-                    href: "/category/fashion",
-                    img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=80",
+                    "tag": "প্রিমিয়াম কালেকশন",
+                    "title": "সময়ের সাথে স্টাইলও হোক নিখুঁত",
+                    "subtitle": "আপনার ব্যক্তিত্বের সাথে মানানসই প্রিমিয়াম হাতঘড়ির সেরা কালেকশন।",
+                    "cta": "কালেকশন দেখুন",
+                    "href": "#",
+                    "img": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=1600&q=80"
                 },
                 {
-                    tag: "লেটেস্ট গ্যাজেট",
-                    title: "টেকনোলজির নতুন দিগন্ত",
-                    subtitle: "প্রিমিয়াম স্মার্টফোন, ল্যাপটপ, অ্যাক্সেসরিজ।",
-                    cta: "এখনই দেখুন",
-                    href: "/category/electronics",
-                    img: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=1600&q=80",
+                    "tag": "মেনস কালেকশন",
+                    "title": "আপনার সময়, আপনার স্টাইল",
+                    "subtitle": "ক্লাসিক থেকে আধুনিক—প্রতিটি মুহূর্তের জন্য বেছে নিন আপনার পছন্দের ঘড়ি।",
+                    "cta": "ঘড়ি দেখুন",
+                    "href": "#",
+                    "img": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1600&q=80"
                 },
                 {
-                    tag: "হোম এসেনশিয়ালস",
-                    title: "ঘরকে দিন নতুন রূপ",
-                    subtitle: "কিচেন, হোম ডেকর ও ঘরের সব দরকারি পণ্য।",
-                    cta: "শপ নাউ",
-                    href: "/category/home-kitchen",
-                    img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=80",
+                    "tag": "ক্লাসিক স্টাইল",
+                    "title": "সিম্পল লুক, অসাধারণ ব্যক্তিত্ব",
+                    "subtitle": "মার্জিত ডিজাইন ও timeless স্টাইলের হাতঘড়ি আপনার প্রতিদিনের লুককে করবে আরও আকর্ষণীয়।",
+                    "cta": "এখনই কিনুন",
+                    "href": "#",
+                    "img": "https://images.unsplash.com/photo-1539874754764-5a96559165b0?w=1600&q=80"
                 },
+                {
+                    "tag": "লাক্সারি কালেকশন",
+                    "title": "যারা সেরাটাই বেছে নেন",
+                    "subtitle": "প্রিমিয়াম ফিনিশ ও আকর্ষণীয় ডিজাইনের লাক্সারি ঘড়িতে ফুটিয়ে তুলুন আপনার রুচি।",
+                    "cta": "লাক্সারি ঘড়ি",
+                    "href": "#",
+                    "img": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=1600&q=80"
+                },
+                {
+                    "tag": "নতুন আগমন",
+                    "title": "নতুন সময়ের সাথে নতুন লুক",
+                    "subtitle": "নতুন ডিজাইনের ট্রেন্ডি হাতঘড়ির কালেকশন এখন Family Shop-এ।",
+                    "cta": "নতুন কালেকশন",
+                    "href": "#",
+                    "img": "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=1600&q=80"
+                }
             ]
-            return res.status(200).json(this._success("Banner list", datas));
+            return res._success(STATUS.OK, "Banner list", datas);
         } catch (e) {
-            res.status(500).json(this._error("some error", { error: e.message }));
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, (e as Error).message || "some error");
         }
     }
     update = () => {

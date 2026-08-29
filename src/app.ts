@@ -7,6 +7,7 @@ import appConfig from '../config/app.js';
 // Import CORS configuration
 import corsConfig from '../config/cors.js';
 import reqMiddleware from '../app/Http/Middleware/req.middleware.js';
+const memory = process.memoryUsage();
 /**
  * Application Entry Point
  * 
@@ -17,6 +18,7 @@ import reqMiddleware from '../app/Http/Middleware/req.middleware.js';
  * - Web and API route handlers
  * - Request size limits and port settings
  */
+const activaryUrl = new Map<string, { url: string, count: number }>();
 export default Application({
     root: process.cwd(),
     config: {
@@ -26,6 +28,18 @@ export default Application({
     port: appConfig.server.port,
     cors: corsConfig,
     callback(app) {
+        app.use("/", (req, _, next) => {
+            const url = req.url;
+            const existing = activaryUrl.get(url);
+            if (existing) {
+                existing.count++;
+            } else {
+                activaryUrl.set(url, { url, count: 1 })
+            }
+            console.log(activaryUrl);
+            console.log(`Total RAM Used: ${(memory.rss / 1024 / 1024).toFixed(2)} MB`);
+            next();
+        })
         app.use(reqMiddleware);
         // Mount API routes under /api prefix
         app.use("/api", api);

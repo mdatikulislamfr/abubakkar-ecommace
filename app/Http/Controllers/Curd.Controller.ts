@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import Controller from "./Controller.js";
 
 export default new class CurdController extends Controller {
@@ -18,18 +19,19 @@ export default new class CurdController extends Controller {
             taka: 500
         }
     ]
-    index = (req, res) => {
+    index = (_: Request, res: Response) => {
         const data = this.datalist;
         res.render("Home", { data });
     }
-    add = (req, res) => {
+    add = (_: Request, res: Response) => {
         res.render("Add");
     }
-    del = (req, res) => {
-        this.datalist = this.datalist.filter((imte) => imte.id != req.params.id);
+    del = (req: Request, res: Response) => {
+        const id = req.params.id;
+        this.datalist = this.datalist.filter((imte) => imte.id != Number(id));
         res.redirect("/");
     }
-    create = (req, res) => {
+    create = (req: Request, res: Response) => {
         this.datalist.push({
             id: Date.now(),
             name: req.body.title,

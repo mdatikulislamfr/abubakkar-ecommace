@@ -7,47 +7,75 @@ import { CategoryModel } from "../../Models/categorys.model.js";
 import { ProductModel } from "../../Models/products.model.js";
 import Controller from "./Controller.js";
 import slugify from 'slugify'
-
+import { ProductReponce } from "../../../@types/index.js";
+import productCache from "../../cache/product.cache.js";
+const productImages = [
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
+    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600",
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600",
+];
 export default new class ProductController extends Controller {
-
+    getQuery = () => ProductModel.joinProducts()
     index = async (req: Request<{ id?: string, slug?: string }>, res: Response) => {
         try {
+
             const id = req.params.id || req.query.id;
             const slug = req.params.slug || req.query.slug;
-            const start = performance.now();
-            const products: Product[] = await ProductModel.table()
-                .join("categories", "products.category_id", "categories.id")
-                .join("brands", "products.brand_id", "brands.id")
-                .select([
-                    "products.*",
-                    // brand
-                    "brands.name as brand_name",
-                    "brands.slug as brand_slug",
-                    "brands.description as brand_description",
-                    "brands.logo as brand_logo",
-                    // category
-                    "categories.name as categorie_name",
-                    "categories.slug as categorie_slug",
-                    "categories.description as categorie_description",
-                    "categories.image as categorie_logo",
-
-                ])
-                .modify((query) => {
-                    if (id) {
-                        return query.where("products.id", "=", id.toString()).first();
-                    }
-                    if (slug) {
-                        return query.where("products.slug", "=", slug.toString()).first();
-                    }
-                    return query;
-                })
-                .where("products.deleted_at", null)
-                .orderBy("products.id", "desc");
-            const end = performance.now();
-            if (!products) {
-                    return res._error(STATUS.NOT_FOUND, "Product not found!");
+            let ti = "serevr";
+            let products: Product[] = [];
+            if (!productCache.isInitialized()) {
+                products = await this.getQuery().orderBy("products.id", "desc");
+                productCache.setAll(products);
+            } else {
+                ti = "case";
+                products = productCache.getAll();
             }
-            return res._success(STATUS.OK, `product list ${(end - start).toFixed(2)}ms`, products);
+            // search
+            if (id) {
+                const itemProduct = productCache.get(Number(id));
+                products = itemProduct ? [itemProduct] : [];
+            } else if (slug) {
+                const itemProduct = productCache.getBySlug(slug.toString());
+                products = itemProduct ? [itemProduct] : [];
+            }
+            if (products.length == 0) {
+                return res._error(STATUS.NOT_FOUND, "Product not found!");
+            }
+
+            const productList: ProductReponce[] = products.map((data: Product) => {
+                return {
+                    id: data?.id || 0,
+                    slug: data?.slug || "0",
+                    name: data.name,
+                    description: data?.description || "",
+                    specification: [
+                        "USB রিচার্জেবল সিস্টেম – যেকোনো পাওয়ার ব্যাংক বা অ্যাডাপ্টারে চার্জ করা যায়।",
+                        "শক্তিশালী মোটর – গভীর টিস্যু মাসাজ নিশ্চিত করে।",
+                        "হালকা এবং পোর্টেবল – ব্যাগে খুব সহজেই বহনযোগ্য।",
+                    ] as string[],
+                    price: Number(data.sale_price) || 0,
+                    oldPrice: 0,
+                    discount: Number(data.discount),
+                    discount_type: data.discount_type,
+                    categoryId: Number(data.category_id),
+                    categoryName: data.categorie_name || "",
+                    images: [productImages[Math.floor(Math.random() * productImages.length)]] as string[],
+                    rating: 1.5,
+                    reviewCount: 1,
+                    stock: data.stock,
+                    brand: data.brand_name || "",
+                    featured: true,
+                    bestSelling: true,
+                    newArrival: true,
+                    createdAt: data.created_at
+                        ? new Date(data.created_at).toISOString()
+                        : "",
+                }
+            })
+
+            return res._success(STATUS.OK, `product list ${ti}`, productList.length == 1 ? productList[0] : productList);
         } catch (error) {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "some error");
         }
@@ -92,8 +120,10 @@ export default new class ProductController extends Controller {
             }
             // insert product with database
             const [insertId] = await ProductModel.table().insert(newProduct);
-            const newdata = await ProductModel.find(insertId) as Product;
-            return res._success(STATUS.CREATED, "success data", newdata);
+            const newProductData = await this.getQuery().where("products.id", "=", insertId).first() as Product;
+            // cache data on cache systems
+            productCache.set(newProductData);
+            return res._success(STATUS.CREATED, "success data", newProductData);
         } catch (error) {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
         }
@@ -168,12 +198,15 @@ export default new class ProductController extends Controller {
                 .where("id", Number(id))
                 .update(updatedProduct);
 
-            const newdata = await ProductModel.find(Number(id)) as Product;
+
+            const newProductData = await this.getQuery().where("products.id", "=", id!).first() as Product;
+            // cache data on cache systems
+            productCache.set(newProductData);
 
             return res._success(
                 STATUS.OK,
                 "Product updated successfully!",
-                newdata
+                newProductData
             );
         } catch (error) {
             return res._error(
@@ -184,7 +217,6 @@ export default new class ProductController extends Controller {
             );
         }
     };
-
     destroy = async (req: Request<{ id?: string }>, res: Response) => {
         try {
             const { id } = req.params;
@@ -203,6 +235,8 @@ export default new class ProductController extends Controller {
                 .update({
                     deleted_at: new Date(),
                 });
+            // cache data on cache systems
+            productCache.delete(Number(id));
             return res._success(STATUS.OK, "Product deleted successfully!");
         } catch (error) {
             return res._error(

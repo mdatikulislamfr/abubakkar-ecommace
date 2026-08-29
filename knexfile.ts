@@ -8,6 +8,7 @@ const config: Knex.Config = {
   client: "mysql2",
   connection: dbconfig.connections.mysql,
   migrations: dbconfig.migrations,
+  seeds: dbconfig.seeds
 };
 
 export default config;

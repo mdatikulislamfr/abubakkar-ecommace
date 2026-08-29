@@ -1,7 +1,5 @@
 import Route from "express-route-framework";
 
-import { Authentication } from 'express-auth-framework'
-import UsersController from "../app/Http/Controllers/Users.Controller.js";
 import CategoryController from "../app/Http/Controllers/Category.Controller.js";
 import AppController from "../app/Http/Controllers/App.Controller.js";
 import ReviewsController from "../app/Http/Controllers/Reviews.Controller.js";
@@ -11,21 +9,7 @@ import BrandController from "../app/Http/Controllers/Brand.Controller.js";
 
 
 Route.group({ prefix: "/v1" }, () => {
-    // user routes
-    Route.group({ prefix: "/users" }, () => {
-        Route.post(`/`, UsersController.registation);
-        Route.post(`/reset/send-code`, UsersController.sendcode);
-        Route.post(`/reset/varify-code`, UsersController.varyfacatin);
-        Route.patch(`/update-pass`, UsersController.updaetPass);
-        Route.post(`/login`, UsersController.login);
-        Route.post(`/logout`, Authentication, UsersController.logout);
-        Route.patch(`/pass-update`, Authentication, UsersController.uppassword);
-        Route.patch(`/info-update`, Authentication, UsersController.infoupdate);
-        Route.group({ prefix: "/affiliate" }, () => {
-            Route.get(`profile`, UsersController.profile);
-            Route.get(`refhistory`, UsersController.refhistoy);
-        })
-    })
+  
 
     // brand routes----------------------------------start
     Route.group({ prefix: "/brand" }, () => {
@@ -54,11 +38,11 @@ Route.group({ prefix: "/v1" }, () => {
     })
     // order routes----------------------------------start
     Route.group({ prefix: "/order" }, () => {
+        Route.post(`/`, OrderController.order);
         Route.get(`/`, OrderController.index);
         Route.get(`/:id`, OrderController.index);
-        Route.post(`/`, OrderController.order);
-        // Route.patch(`/:id`, OrderController.update);
-        // Route.delete(`/:id`, OrderController.destroy);
+        Route.patch(`/:id`, OrderController.update);
+        Route.delete(`/:id`, OrderController.destroy);
         Route.get(`/invoice/:id`, OrderController.invoice);
     })
     // app routes----------------------------------start

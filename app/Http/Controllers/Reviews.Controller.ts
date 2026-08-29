@@ -1,8 +1,9 @@
+import { Request, Response } from "express";
 import Controller from "./Controller.js";
 
 
 export default new class ReviewsController extends Controller {
-    index = (req, res) => {
+    index = (_: Request, res: Response) => {
         try {
             const datas = [
                 {
@@ -24,7 +25,7 @@ export default new class ReviewsController extends Controller {
             ]
             return res.status(200).json(this._success("Reviews list", datas));
         } catch (e) {
-            res.status(500).json(this._error("some error", { error: e.message }));
+            return res.status(500).json(this._error("some error", { error: (e as Error).message }));
         }
     }
 

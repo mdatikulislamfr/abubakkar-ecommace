@@ -17,7 +17,7 @@ export interface Banner {
     updated_at?: Date | string;
 }
 export interface App {
-    id?: number;
+    id: number;
     name: string,
     title: string,
     insite_dhaka: number,
@@ -75,7 +75,7 @@ export interface Category {
     deleted_at?: Date | string | null;
 }
 export interface OrderItem {
-    id: number;
+    id?: number;
     order_id: number;
     product_id: number;
     product_name: string;
@@ -84,14 +84,13 @@ export interface OrderItem {
     unit_price: number;
     discount: number;
     discount_type: "fixed" | "percent";
-    tax: number;
     subtotal: number;
     total: number;
-    created_at: Date | string;
-    updated_at: Date | string;
+    created_at?: Date | string;
+    updated_at?: Date | string;
 }
 export interface Order {
-    id?: number;
+    id: number;
     order_number?: string;
     customer_id?: number | null;
     status?:
@@ -112,6 +111,8 @@ export interface Order {
     subtotal?: number;
     discount?: number;
     total?: number;
+    delivary_area:string
+    delivary_charge?:number,
     paid_amount?: number;
     due_amount?: number;
     customer_name: string;
@@ -123,6 +124,7 @@ export interface Order {
     created_at?: Date | string;
     updated_at?: Date | string;
     deleted_at?: Date | string | null;
+    product?:OrderItem[]
 }
 export interface ProductImage {
     id: number;
@@ -138,7 +140,7 @@ export interface ProductImage {
     deleted_at: Date | string | null;
 }
 export interface Product {
-    id?: number;
+    id: number;
     category_id: number;
     brand_id: number;
     name: string;
@@ -159,6 +161,16 @@ export interface Product {
     created_at?: Date | string;
     updated_at?: Date | string;
     deleted_at?: Date | string | null;
+
+    // other
+    brand_name?: string,
+    brand_slug?: string,
+    brand_description?: string,
+    brand_logo?: string,
+    categorie_name?: string,
+    categorie_slug?: string,
+    categorie_description?: string,
+    categorie_logo?: string,
 }
 
 export interface Review {

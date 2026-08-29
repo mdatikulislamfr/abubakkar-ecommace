@@ -22,6 +22,23 @@ export async function up(knex: Knex): Promise<void> {
         table.index(["id"]);
 
     });
+
+    // demo data on table
+    await knex("app").insert({
+        name: "ফ্যামিলি শপ",
+        title: "ফ্যামিলি শপ - আপনার বিশ্বস্ত অনলাইন শপিং",
+        insite_dhaka: 60,
+        outsite_dhaka: 120,
+        email: "support@familyshop.com",
+        location: "মিরপুর, ঢাকা, বাংলাদেশ",
+        phone: "+8801700000000",
+        facebook: "https://facebook.com/familyshop",
+        linkdin: "https://linkedin.com/company/familyshop",
+        logo: "https://example.com/uploads/logo.png",
+        status: true,
+        messager: "https://m.me/familyshop",
+        youtube: "https://youtube.com/@familyshop"
+    });
 }
 
 export async function down(knex: Knex): Promise<void> {
