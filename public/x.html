@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="Express App - A modern TypeScript framework built on Express.js." />
+
+    <title>Express App — TypeScript Framework</title>
+    <link rel="stylesheet" href="./style.css">
+    
+</head>
+
+<body>
+
+    <!-- Navbar -->
+
+    <nav>
+        <div class="container nav-inner">
+
+            <a href="/" class="logo">
+                <div class="logo-icon">E</div>
+                Express App
+            </a>
+
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#install">Installation</a>
+
+                <a class="github" href="https://github.com/mdatikulislamfr/express-app" target="_blank" rel="noopener">
+                    GitHub
+                </a>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- Hero -->
+
+    <main>
+
+        <section class="hero">
+
+            <div class="container">
+
+                <div class="badge">
+                    <span></span>
+                    Built with Node.js & TypeScript
+                </div>
+
+                <h1>
+                    Build powerful APIs with
+                    <span class="gradient-text">
+                        Express App
+                    </span>
+                </h1>
+
+                <p>
+                    A modern, developer-friendly Express.js
+                    application framework designed for clean,
+                    scalable and maintainable TypeScript
+                    applications.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#install" class="btn btn-primary">
+                        Get Started
+                    </a>
+
+                    <a href="https://github.com/mdatikulislamfr/express-app" target="_blank" rel="noopener"
+                        class="btn btn-secondary">
+                        View on GitHub
+                    </a>
+
+                </div>
+
+
+                <!-- Code -->
+
+                <div class="code-box">
+
+                    <div class="code-header">
+
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+
+                        <span class="filename">
+                            app.ts
+                        </span>
+
+                    </div>
+
+                    <pre><code><span class="keyword">import</span> { Application }
+<span class="keyword">from</span> <span class="string">"express-application-framework"</span>;
+
+<span class="keyword">const</span> app = <span class="function">Application</span>({
+    config: {
+        jsonLimit: <span class="string">"1mb"</span>,
+        urlencodedLimit: <span class="string">"1mb"</span>
+    }
+});
+
+app.<span class="function">listen</span>(<span class="string">3000</span>);</code></pre>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Features -->
+
+        <section id="features">
+
+            <div class="container">
+
+                <div class="section-title">
+
+                    <h2>
+                        Everything you need
+                    </h2>
+
+                    <p>
+                        A clean foundation for building
+                        modern backend applications.
+                    </p>
+
+                </div>
+
+
+                <div class="features">
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            TS
+                        </div>
+
+                        <h3>
+                            TypeScript First
+                        </h3>
+
+                        <p>
+                            Build type-safe applications with
+                            modern TypeScript architecture.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            DB
+                        </div>
+
+                        <h3>
+                            Database Ready
+                        </h3>
+
+                        <p>
+                            Designed to work seamlessly with
+                            Knex, MySQL, SQLite and other databases.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            API
+                        </div>
+
+                        <h3>
+                            Powerful APIs
+                        </h3>
+
+                        <p>
+                            Create clean REST APIs with
+                            controllers, middleware and routes.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            M
+                        </div>
+
+                        <h3>
+                            Middleware
+                        </h3>
+
+                        <p>
+                            Organize authentication, security,
+                            validation and request processing.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            CLI
+                        </div>
+
+                        <h3>
+                            Developer CLI
+                        </h3>
+
+                        <p>
+                            Generate controllers, models,
+                            migrations and other application files.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            ⚡
+                        </div>
+
+                        <h3>
+                            Lightweight
+                        </h3>
+
+                        <p>
+                            Keep your application simple,
+                            fast and easy to maintain.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Architecture -->
+
+        <section id="architecture">
+
+            <div class="container architecture">
+
+                <div>
+
+                    <h2>
+                        Clean architecture.
+                        <br>
+                        Better projects.
+                    </h2>
+
+                    <p>
+                        Express App provides a structured
+                        foundation so you can focus on building
+                        your application's features instead of
+                        repeating boilerplate.
+                    </p>
+
+                </div>
+
+
+                <div class="stack">
+
+                    <div class="stack-item">
+                        <strong>
+                            Controllers
+                        </strong>
+                        <span>
+                            HTTP Logic
+                        </span>
+                    </div>
+
+                    <div class="stack-item">
+                        <strong>
+                            Requests
+                        </strong>
+                        <span>
+                            Validation
+                        </span>
+                    </div>
+
+                    <div class="stack-item">
+                        <strong>
+                            Middleware
+                        </strong>
+                        <span>
+                            Security
+                        </span>
+                    </div>
+
+                    <div class="stack-item">
+                        <strong>
+                            Models
+                        </strong>
+                        <span>
+                            Database
+                        </span>
+                    </div>
+
+                    <div class="stack-item">
+                        <strong>
+                            Jobs
+                        </strong>
+                        <span>
+                            Background Tasks
+                        </span>
+                    </div>
+
+                    <div class="stack-item">
+                        <strong>
+                            Migrations
+                        </strong>
+                        <span>
+                            Database Schema
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Installation -->
+
+        <section id="install">
+
+            <div class="container">
+
+                <div class="install">
+
+                    <h2>
+                        Start building today
+                    </h2>
+
+                    <p>
+                        Install Express App and start building
+                        your next TypeScript backend.
+                    </p>
+
+                    <div class="command">
+                        npm install express-application-framework
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <div class="container footer-inner">
+
+            <div>
+                © 2026 Express App Framework
+            </div>
+
+            <div>
+                Built with ❤️ using Node.js & TypeScript
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
