@@ -1,174 +1,161 @@
 import { Request, Response } from "express";
 import Controller from "./Controller.js";
 import { AppModel } from "../../Models/app.model.js";
-import status from "../../../config/status.js";
-import { _error, _success } from "../../helpers/appHelper.js";
-import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
 import appCache from "../../cache/app.cache.js";
 import STATUS from "../../../config/status.js";
-
-
+import { App, Banner } from "../../../@types/table.js";
+import { BannerModel } from "../../Models/banner.model.js";
+import bannerCache from "../../cache/banner.cache.js";
+import { empty } from "../../helpers/appHelper.js";
+import path from "path";
+import { Worker } from "worker_threads";
+import multer from "../../../config/multer.js";
+const workerPath = path.join(process.cwd(), 'app/Worker/imageWorker.js');
 export default new class AppController extends Controller {
     index = async (_: Request, res: Response) => {
         try {
-            if (appCache.size() == 0) {
-                await AppModel.cachingOnModel();
-            }
-            const app = appCache.get(0);
-            if (!app) {
-                return res.status(status.NOT_FOUND).json(_error({ message: "App data not found" }));
-            }
-            const datas = {
-                name: app.name || "",
-                title: app.title || "",
-                delivary: {
-                    insite: app.insite_dhaka || 60,
-                    ousite: app.outsite_dhaka || 120,
-                },
-                contact: {
-                    email: app.email || "",
-                    location: app.location || "",
-                    phone: app.phone || "",
-                },
-                facebook: app.facebook || "",
-                linkdin: app.linkdin || "",
-                logo: app.logo || "",
-                messager: app.messager || "",
-                youtube: app.youtube || "",
-            }
-            return res.status(200).json(this._success("Welcome to the E-commerce API", datas));
+            const app = appCache.getAll();
+            if (!app) return res._error(STATUS.NOT_FOUND, "App data not found", AppModel.emptydata);
+            const datas = AppModel.responceDataModel(app[0]);
+            return res._success(STATUS.OK, "Welcome to the E-commerce API", datas);
         } catch (e) {
-            return res.status(500).json(this._error(e instanceof Error ? e.message : "some error"));
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some error");
         }
     }
-    appset = async (req: Request, res: Response) => {
+    set = async (req: Request, res: Response) => {
         try {
-            const data = req.body;
-            const app = await AppModel
-                .table()
-                .first();
-            if (!app) {
 
-                await AppModel
-                    .table()
-                    .insert(data);
+            const app = req.body as App;
+            if (Object.keys(app).length == 0) return res._error(STATUS.BAD_REQUEST, "app all data empty!");
+            let idx = null;
+            if (appCache.getAll().length > 0) {
+                const id = appCache.getAll()[0].id;
+                await AppModel.set(app);
+                idx = id;
+            } else {
+                const [insertId] = await AppModel.table().insert({ ...app, logo: "logo.webp" });
+                idx = insertId;
+            }
+            const appdata = await AppModel.find(idx);
+            appCache.set(appdata);
 
-                return res
-                    .status(status.OK)
-                    .json(
-                        _success({
-                            message: "App data set successfully",
-                        })
-                    );
+
+
+            // imaeg upload
+            const file = req.file;
+            if (file) {
+                new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        fileName: "logo",
+                        label: false,
+                        size: 512,
+                        outputPath: multer.path.upload()
+                    }
+                })
             }
 
-            await AppModel
-                .table()
-                .where("id", app.id)
-                .update({
-                    ...data,
-                    updated_at: new Date(),
-                });
-            await AppModel.cachingOnModel();
-            const updatedApp = appCache.get(0);
-
-            /**
-             * Create activity log.
-             *
-             * Stores:
-             * - Who updated the app settings
-             * - Old app data
-             * - New app data
-             * - IP address
-             * - User agent
-             */
-            await ActivityLogsModel
-                .table()
-                .insert({
-                    user_id: req.user?.id ?? null,
-                    action: "updated",
-                    subject_type: "App",
-                    subject_id: Number(app.id),
-                    description: "App settings updated successfully",
-                    old_values: JSON.stringify(app),
-                    new_values: JSON.stringify(updatedApp),
-                    ip_address: req.ip,
-                    user_agent: req.get("user-agent") ?? null,
-                });
-            return res
-                .status(status.OK)
-                .json(
-                    _success({
-                        message: "App settings updated successfully",
-                        data: updatedApp,
-                    })
-                );
-
-        } catch (error) {
-            return res
-                .status(status.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
+            const send = AppModel.responceDataModel(appCache.getAll()[0]);
+            if (!app) return res._error(STATUS.NOT_FOUND, "App data not found");
+            return res._success(STATUS.OK, "Successfull", send);
+        } catch (e) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some error");
         }
-    };
-    bannaer = (_: Request, res: Response) => {
+    }
+    bannaerget = async (_: Request, res: Response) => {
         try {
-            const datas = [
-                {
-                    "tag": "প্রিমিয়াম কালেকশন",
-                    "title": "সময়ের সাথে স্টাইলও হোক নিখুঁত",
-                    "subtitle": "আপনার ব্যক্তিত্বের সাথে মানানসই প্রিমিয়াম হাতঘড়ির সেরা কালেকশন।",
-                    "cta": "কালেকশন দেখুন",
-                    "href": "#",
-                    "img": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=1600&q=80"
-                },
-                {
-                    "tag": "মেনস কালেকশন",
-                    "title": "আপনার সময়, আপনার স্টাইল",
-                    "subtitle": "ক্লাসিক থেকে আধুনিক—প্রতিটি মুহূর্তের জন্য বেছে নিন আপনার পছন্দের ঘড়ি।",
-                    "cta": "ঘড়ি দেখুন",
-                    "href": "#",
-                    "img": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1600&q=80"
-                },
-                {
-                    "tag": "ক্লাসিক স্টাইল",
-                    "title": "সিম্পল লুক, অসাধারণ ব্যক্তিত্ব",
-                    "subtitle": "মার্জিত ডিজাইন ও timeless স্টাইলের হাতঘড়ি আপনার প্রতিদিনের লুককে করবে আরও আকর্ষণীয়।",
-                    "cta": "এখনই কিনুন",
-                    "href": "#",
-                    "img": "https://images.unsplash.com/photo-1539874754764-5a96559165b0?w=1600&q=80"
-                },
-                {
-                    "tag": "লাক্সারি কালেকশন",
-                    "title": "যারা সেরাটাই বেছে নেন",
-                    "subtitle": "প্রিমিয়াম ফিনিশ ও আকর্ষণীয় ডিজাইনের লাক্সারি ঘড়িতে ফুটিয়ে তুলুন আপনার রুচি।",
-                    "cta": "লাক্সারি ঘড়ি",
-                    "href": "#",
-                    "img": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=1600&q=80"
-                },
-                {
-                    "tag": "নতুন আগমন",
-                    "title": "নতুন সময়ের সাথে নতুন লুক",
-                    "subtitle": "নতুন ডিজাইনের ট্রেন্ডি হাতঘড়ির কালেকশন এখন Family Shop-এ।",
-                    "cta": "নতুন কালেকশন",
-                    "href": "#",
-                    "img": "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=1600&q=80"
-                }
-            ]
-            return res._success(STATUS.OK, "Banner list", datas);
+            const banners = bannerCache.getAll();
+            if (banners.length == 0) return res._error(STATUS.NOT_FOUND, "banner not found");
+            const datas = BannerModel.responceDataModel(banners);
+            return res._success(STATUS.OK, "Welcome to the E-commerce API", datas);
+        } catch (e) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some error");
+        }
+    }
+    bannaeradd = async (req: Request, res: Response) => {
+        try {
+            const banner = req.body as Banner;
+            if (empty(banner.title) || empty(banner.subtitle) || empty(banner.sort_order)) {
+                return res._error(STATUS.BAD_REQUEST, "data input empty");
+            }
+            const [insertId] = await BannerModel.table().insert(banner);
+            const slider = await BannerModel.find(insertId);
+            const send = BannerModel.responceDataModel([slider]);
+            // imaeg upload
+            const file = req.file;
+            if (file) {
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        label: true,
+                        outputPath: multer.path.upload()
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    if (result.success) {
+                        await BannerModel.table().where({ id: insertId }).update({ image: result.name })
+                        const sliderx = await BannerModel.find(insertId);
+                        sliderx.image = result.name;
+                        bannerCache.set(sliderx);
+                    }
+                });
+            }
+            bannerCache.set(slider);
+            return res._success(STATUS.OK, "banner create succssfull", send);
         } catch (e) {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, (e as Error).message || "some error");
         }
     }
-    update = () => {
+    update = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const banner = req.body as Banner;
+            console.log(bannerCache.getAll());
+            if (!bannerCache.has(Number(id))) return res._error(STATUS.NOT_FOUND, "banner not found");
 
+            if (empty(banner.title) || empty(banner.subtitle || "") || empty(banner.status || 1) || empty(banner.sort_order)) {
+                return res._error(STATUS.BAD_REQUEST, "data input empty");
+            }
+            await BannerModel.table().where("id", "=", id).update(banner);
+            const bannerItem = await BannerModel.find(Number(id)) as Banner;
+            const send = BannerModel.responceDataModel([bannerItem]);
+            bannerCache.set(bannerItem);
+            const file = req.file;
+            if (file) {
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        label: true,
+                        outputPath: multer.path.upload()
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    if (result.success) {
+                        multer.path.unlink(bannerItem.image)
+                        await BannerModel.table().where({ id: id }).update({ image: result.name })
+                        const sliderx = await BannerModel.find(Number(id));
+                        sliderx.image = result.name;
+                        bannerCache.set(sliderx);
+                    }
+                });
+            }
+            return res._success(STATUS.OK, "banner update successfull", send);
+        } catch (e) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, (e as Error).message || "some error");
+        }
+    }
+    remove = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const banner = bannerCache.get(Number(id));
+            if (!banner) return res._error(STATUS.NOT_FOUND, "banner not found");
+            multer.path.unlink(banner?.image || "")
+            await BannerModel.table().del(id);
+            bannerCache.delete(Number(id));
+            return res._success(STATUS.OK, "banner remove successfull");
+        } catch (e) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, (e as Error).message || "some error");
+        }
     }
 
 }

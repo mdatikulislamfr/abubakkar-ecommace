@@ -6,6 +6,7 @@ export default function reqMiddleware(_: Request, res: Response, next: NextFunct
         return res.status(status).json(_success({ message, data }))
     }
     res._error = (status, message: string, data: unknown) => {
+        console.log(status, ":", message)
         res.status(status).json(_error({ message, data }))
     }
     next();

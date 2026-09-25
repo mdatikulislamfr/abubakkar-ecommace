@@ -6,7 +6,6 @@ export async function up(knex: Knex): Promise<void> {
         table.bigInteger("parent_id").unsigned().nullable();
         table.string("name", 150).notNullable();
         table.string("slug", 180).notNullable().unique();
-        table.text("description").nullable();
         table.string("image", 500).nullable();
         table.integer("sort_order").unsigned().notNullable().defaultTo(0);
         table.boolean("status").notNullable().defaultTo(true);

@@ -85,7 +85,7 @@ export class OrderModel extends baseModel {
           return Array.from(grouped.values());
      }
 
-     static async cachingOnModel() {
+     static async cacheInitialize() {
           try {
                if (!orderCache.isInitialized()) {
                     const res: Order[] = this.groupOrders(await this.join());
@@ -95,4 +95,5 @@ export class OrderModel extends baseModel {
                throw (error instanceof Error ? error.message : "somer errror");
           }
      }
+
 }

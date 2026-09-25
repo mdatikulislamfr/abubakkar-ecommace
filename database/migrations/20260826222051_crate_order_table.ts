@@ -3,8 +3,7 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable("orders", (table) => {
         table.bigIncrements("id").primary();
-        table.string("order_number", 100).notNullable().unique();
-        table.bigInteger("customer_id").unsigned().nullable();
+        table.string("random_id", 100).notNullable().unique();
         table
             .enu("status", [
                 "pending",
@@ -33,16 +32,13 @@ export async function up(knex: Knex): Promise<void> {
             ["inside", "outside"])
             .comment("dhaka inside or outside");
         table.decimal("delivary_charge", 12, 2).notNullable().defaultTo(0.00)
-        
-        table.decimal("subtotal", 12, 2).notNullable().defaultTo(0.00);
         table.decimal("discount", 12, 2).notNullable().defaultTo(0.00);
+        table.decimal("subtotal", 12, 2).notNullable().defaultTo(0.00);
         table.decimal("total", 12, 2).notNullable().defaultTo(0.00);
-        table.decimal("paid_amount", 12, 2).notNullable().defaultTo(0.00);
-        table.decimal("due_amount", 12, 2).notNullable().defaultTo(0.00);
+        // customar information
         table.string("customer_name", 150).notNullable();
         table.string("customer_phone", 30).notNullable();
-        table.text("shipping_address").notNullable();
-        table.text("billing_address").nullable();
+        table.text("customer_address").notNullable();
         table.text("customer_note").nullable();
         table.text("admin_note").nullable();
         table.timestamp("ordered_at").notNullable().defaultTo(knex.fn.now());
@@ -53,7 +49,6 @@ export async function up(knex: Knex): Promise<void> {
             .defaultTo(knex.fn.now());
         table.timestamp("deleted_at").nullable();
         // index
-        table.index(["customer_id"]);
         table.index(["status"]);
         table.index(["payment_status"]);
         table.index(["ordered_at"]);

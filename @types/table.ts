@@ -1,99 +1,122 @@
-
-
+export interface ActivityLog {
+    id: number;
+    user_id?: number | null;
+    action: string;
+    subject_type?: string | null;
+    subject_id?: number | null;
+    description?: string | null;
+    old_values?: Record<string, unknown> | null;
+    new_values?: Record<string, unknown> | null;
+    ip_address?: string | null;
+    user_agent?: string | null;
+    created_at?: Date;
+}
 export interface Banner {
-    id?: number;
+    id: number;
     title: string;
-    subtitle?: string;
+    subtitle?: string | null;
     image: string;
-    mobile_image?: string;
-    link?: string;
-    button_text?: string;
-    position?: string;
+    link?: string | null;
     sort_order?: number;
-    status: "active" | "inactive";
-    start_at?: Date | string;
-    end_at?: Date | string;
-    created_at?: Date | string;
-    updated_at?: Date | string;
+    status?: number;
+    created_at?: Date;
+    updated_at?: Date;
 }
 export interface App {
     id: number;
-    name: string,
-    title: string,
-    insite_dhaka: number,
-    outsite_dhaka: number,
-    email: string,
-    location: string,
-    phone: string,
-    facebook?: string,
-    linkdin?: string,
-    logo?: string,
-    status: boolean,
-    messager?: string,
-    youtube?: string,
+    name: string;
+    title: string;
+    logo?: string | null;
+    insite_dhaka: number;
+    outsite_dhaka: number;
+    email: string;
+    location: string;
+    phone: string;
+    facebook?: string | null;
+    linkdin?: string | null;
+    messager?: string | null;
+    youtube?: string | null;
+    status: boolean;
     created_at: Date;
     updated_at: Date;
 }
-export interface ActivityLog {
-    id: number;
-    user_id: number | null;
-    action: string;
-    subject_type: string | null;
-    subject_id: number | null;
-    description: string | null;
-    old_values: Record<string, unknown> | string | null;
-    new_values: Record<string, unknown> | string | null;
-    ip_address: string | null;
-    user_agent: string | null;
-    created_at: Date;
-}
-export interface Brand {
-    id?: number;
-    name: string;
-    slug?: string;
-    code?: string | null;
-    description: string | null;
-    logo?: string | null;
-    website: string | null;
-    status: boolean;
-    sort_order: number;
-    created_at?: Date | string;
-    updated_at?: Date | string;
-    deleted_at?: Date | string | null;
-}
 export interface Category {
-    id?: number;
+    id: number;
     parent_id?: number | null;
     name: string;
-    slug?: string;
+    slug: string;
+    image?: string | null;
+    sort_order: number;
+    status: boolean;
+    created_at: Date;
+    updated_at: Date;
+    deleted_at?: Date | null;
+}
+export interface Brand {
+    id: number;
+    name: string;
+    slug: string;
+    logo?: string | null;
+    website?: string | null;
+    status: boolean;
+    sort_order: number;
+    created_at?: Date;
+    updated_at?: Date;
+    deleted_at?: Date | null;
+}
+// product section------------
+export interface Product {
+    id: number;
+    category_id: number;
+    brand_id: number | null;
+    name: string;
+    slug: string;
+    sku: string;
+    title: string | null;
     description: string | null;
-    image: string | null;
-    sort_order?: number;
-    status?: boolean;
-    created_at?: Date | string;
-    updated_at?: Date | string;
-    deleted_at?: Date | string | null;
+    unit: string;
+    status: boolean;
+    created_at?: Date;
+    updated_at?: Date;
+    deleted_at?: Date | null;
+    // others
+    brand_name?: string | null,
+    categorie_name?: string | null,
+    reciveImages?: boolean | null,
 }
-export interface OrderItem {
+export interface ProductVariant {
     id?: number;
-    order_id: number;
     product_id: number;
-    product_name: string;
-    sku: string | null;
-    quantity: number;
-    unit_price: number;
+    size: string;
+    price: number;
+    old_price: number;
+    purchase_price: number;
+    stock: number;
+    min_stock: number;
     discount: number;
-    discount_type: "fixed" | "percent";
-    subtotal: number;
-    total: number;
-    created_at?: Date | string;
-    updated_at?: Date | string;
+    discount_type: 'fixed' | 'percent';
+    status: boolean;
+    created_at?: Date;
+    updated_at?: Date;
+    deleted_at?: Date | null;
 }
+export interface ProductImage {
+    id: number;
+    product_id: number;
+    image: string;
+    for: "product" | "category" | "banner" | "brand";
+    sort_order: number;
+    is_primary: boolean;
+    status: boolean;
+    created_at?: Date;
+    updated_at?: Date;
+    deleted_at?: Date | null;
+}
+// prodcut sesction end
 export interface Order {
     id: number;
-    order_number?: string;
-    customer_id?: number | null;
-    status?:
+    random_id: string;
+    status:
     | "pending"
     | "confirmed"
     | "processing"
@@ -101,105 +124,53 @@ export interface Order {
     | "delivered"
     | "cancelled"
     | "returned";
-    payment_status?:
+    payment_status:
     | "pending"
     | "partial"
     | "paid"
     | "failed"
     | "refunded";
     payment_method?: string | null;
-    subtotal?: number;
-    discount?: number;
-    total?: number;
-    delivary_area:string
-    delivary_charge?:number,
-    paid_amount?: number;
-    due_amount?: number;
+    delivary_area: "inside" | "outside";
+    delivary_charge: number;
+    discount: number;
+    subtotal: number;
+    total: number;
     customer_name: string;
     customer_phone: string;
-    shipping_address: string;
-    customer_note: string | null;
+    customer_address: string;
+    customer_note?: string | null;
     admin_note?: string | null;
-    ordered_at?: Date | string;
-    created_at?: Date | string;
-    updated_at?: Date | string;
-    deleted_at?: Date | string | null;
-    product?:OrderItem[]
+    ordered_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    deleted_at?: Date | null;
 }
-export interface ProductImage {
-    id: number;
+export interface OrderCustomerDetails {
+    customer_name: string;
+    customer_phone: string;
+    customer_address: string;
+    customer_note?: string | null;
+    payment_method?: string | null;
+    delivary_area: "inside" | "outside";
+    delivary_charge: number;
+    discount: number;
+    subtotal: number;
+    total: number;
+}
+export interface OrderItem {
+    id?: number;
+    order_id?: number;
     product_id: number;
-    image: string;
-    alt: string | null;
-    title: string | null;
-    sort_order: number;
-    is_primary: boolean;
-    status: boolean;
-    created_at: Date | string;
-    updated_at: Date | string;
-    deleted_at: Date | string | null;
-}
-export interface Product {
-    id: number;
-    category_id: number;
-    brand_id: number;
-    name: string;
-    slug: string;
-    sku: string;
-    barcode?: string | null;
-    barcodeImage?: Buffer;
-    description: string | null;
+    product_name: string;
+    sku?: string | null;
+    quantity: number;
+    unit_price: number;
     unit: string;
-    purchase_price: number;
-    sale_price: number;
     discount: number;
     discount_type: "fixed" | "percent";
-    stock: number;
-    min_stock: number;
-    status: boolean;
-    featured: boolean;
-    created_at?: Date | string;
-    updated_at?: Date | string;
-    deleted_at?: Date | string | null;
-
-    // other
-    brand_name?: string,
-    brand_slug?: string,
-    brand_description?: string,
-    brand_logo?: string,
-    categorie_name?: string,
-    categorie_slug?: string,
-    categorie_description?: string,
-    categorie_logo?: string,
-}
-
-export interface Review {
-    id: number;
-    product_id: number;
-    customer_id: number | null;
-    order_id: number | null;
-    order_item_id: number | null;
-    rating: number;
-    title: string | null;
-    comment: string | null;
-    status: "pending" | "approved" | "rejected";
-    is_verified: boolean;
-    admin_reply: string | null;
-    replied_at: Date | string | null;
-    created_at: Date | string;
-    updated_at: Date | string;
-    deleted_at: Date | string | null;
-}
-export interface ProductStock {
-    id: number;
-    product_id: number;
-    warehouse_id: number | null;
-    quantity: number;
-    reserved_quantity: number;
-    available_quantity: number;
-    min_stock: number;
-    max_stock: number;
-    reorder_level: number;
-    created_at: Date | string;
-    updated_at: Date | string;
+    subtotal: number;
+    total: number;
+    created_at?: Date;
+    updated_at?: Date;
 }

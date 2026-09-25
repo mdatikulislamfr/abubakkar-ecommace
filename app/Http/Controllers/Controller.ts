@@ -1,6 +1,9 @@
 
 export default class Controller {
-    minWidthdraw = 100;
+    area = {
+        insite: "Inside Dhaka",
+        outsite: "Outside Dhaka"
+    };
     _error(message = "", data = {}) {
         return { error: true, message, data }
     }

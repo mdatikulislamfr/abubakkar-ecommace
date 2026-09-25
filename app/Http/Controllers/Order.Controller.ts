@@ -1,25 +1,118 @@
 import { Request, Response } from "express";
 import Controller from "./Controller.js";
-import { Order, OrderItem, Product } from "../../../@types/table.js";
+import { App, Order, OrderCustomerDetails, OrderItem, Product, ProductVariant } from "../../../@types/table.js";
 import STATUS from "../../../config/status.js";
 import { OrderRequest } from "../../../@types/index.js";
 import { ProductModel } from "../../Models/products.model.js";
 import orderCache from "../../cache/order.cache.js";
-import productCache from "../../cache/product.cache.js";
 import { OrderModel } from "../../Models/order.model.js";
+import { empty } from "../../helpers/appHelper.js";
+import { VarientModel } from "../../Models/varient.model.js";
 import { OrderItemModel } from "../../Models/orderItem.model.js";
-import { fakeId } from "../../helpers/appHelper.js";
-import { deliveryHelper } from "../../helpers/delivaryHelper.js";
-
-
+import crypto from "crypto";
+import { AppModel } from "../../Models/app.model.js";
 export default new class OrdersController extends Controller {
+    // client work
+    request = async (req: Request, res: Response) => {
+        try {
+            const {
+                products,
+                deliveryArea,
+                paymentMethod,
+                customerName,
+                customerPhone,
+                customerAddress
+            } = req.body;
+
+            // chck empty
+            if (
+                empty(deliveryArea) ||
+                empty(paymentMethod) ||
+                empty(customerName) ||
+                empty(customerPhone) ||
+                empty(customerAddress)
+            ) {
+                return res._error(STATUS.BAD_REQUEST, "All fields are required and quantity must be greater than 0.");
+            }
+            const productsArray = JSON.parse(products) as { productId: string, variantId: string, quantity: string }[];
+            if (productsArray.length == 0) return res._error(STATUS.BAD_REQUEST, "Prodcut not found!");
+            const app = await AppModel.table().first() as App;
+            // check dalivaryCharge
+            let dalivaryCharge = 0;
+            if (deliveryArea === this.area.insite) {
+                dalivaryCharge = app.insite_dhaka;
+            } else if (deliveryArea === this.area.outsite) {
+                dalivaryCharge = app.outsite_dhaka;
+            } else {
+                return res._error(STATUS.BAD_REQUEST, "Invalid delivery area.");
+            }
+            // check product and variant id
+            const orderProduct: OrderItem[] = [] as OrderItem[];
+            for (const productData of productsArray) {
+                const [product, variant]: [Product, ProductVariant] = await Promise.all([
+                    ProductModel.find(Number(productData.productId)),
+                    VarientModel.find(Number(productData.variantId))
+                ]);
+                const discoutPrice = variant.discount_type == "fixed" ? variant.discount : (Number(variant.price) * Number(variant.discount)) / 100;
+                const subtotal = Math.floor((variant.price * Number(productData.quantity)));
+                if (product && variant) {
+                    orderProduct.push({
+                        discount: discoutPrice,
+                        discount_type: variant.discount_type,
+                        product_id: product.id || 0,
+                        product_name: product.name + ` ${variant.size}`,
+                        quantity: Number(productData.quantity),
+                        subtotal: Number(subtotal.toFixed(0)),
+                        total: Number(subtotal) - discoutPrice,
+                        unit: product.unit,
+                        unit_price: variant.price,
+                        sku: "ORDER-",
+                    })
+                }
+            }
+            const totalDiscount = orderProduct.reduce((_dis: number, cur) => _dis = cur.discount, 0);
+            const subtotal = orderProduct.reduce((_dis: number, cur) => _dis = cur.subtotal, 0);
+            const total = orderProduct.reduce((_dis: number, cur) => _dis = cur.total, 0) + Number(dalivaryCharge);
+            // store customar information
+            const custoamrInformation: OrderCustomerDetails = {
+                customer_name: customerName,
+                customer_address: customerAddress,
+                customer_phone: customerPhone,
+                customer_note: "",
+                delivary_area: deliveryArea === this.area.insite ? "inside" : "outside",
+                delivary_charge: dalivaryCharge,
+                discount: totalDiscount,
+                subtotal: subtotal,
+                total: total,
+                payment_method: paymentMethod,
+            }
+            const generateRandomId = crypto.randomBytes(8).toString('hex').substring(3, 9).toUpperCase();
+            const newOrder = {
+                ...custoamrInformation,
+                status: "pending",
+                random_id: generateRandomId,
+            }
+            const [insertId] = await OrderModel.table().insert(newOrder);
+            // product information
+            const product: OrderItem[] = orderProduct.map(d => {
+                return { ...d, order_id: insertId }
+            })
+            await OrderItemModel.table().insert(product);
+            return res._success(STATUS.OK, "order successfull", { id: insertId });
+        } catch (error) {
+            console.log(error);
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error");
+        }
+    }
 
 
+
+
+    // admin work
     index = async (req: Request<{ order_id?: string, phone?: string, id?: string }>, res: Response) => {
         try {
             const { phone } = req.query;
             const { id } = req.params;
-            await OrderModel.cachingOnModel();
             let orders: Order[] = orderCache.getAll() as Order[];
             if (phone) {
                 const order = orderCache.getByPhone(phone.toString());
@@ -39,84 +132,6 @@ export default new class OrdersController extends Controller {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error");
         }
     }
-    order = async (req: Request, res: Response) => {
-        try {
-            const { customer_name, customer_note, customer_phone, shipping_address, products, delivary_area } = req.body as OrderRequest;
-
-            if (products.length === 0) return res._error(STATUS.CONFLICT, "Order product empty");
-            if (!customer_name || !customer_phone || !shipping_address || !delivary_area) {
-                return res._error(STATUS.CONFLICT, "Customr input empty");
-            }
-            // product item send db //order prodcut
-            await ProductModel.cachingOnModel();
-            await OrderModel.cachingOnModel();
-
-            const orderItem: OrderItem[] = products.map((data) => {
-                const product: Product = productCache.get(Number(data.id)) as Product;
-                if (!product) return null;
-                const quantity = Number(data.quantity);
-
-                if (!Number.isFinite(quantity) || quantity <= 0) {
-                    return null;
-                }
-                const subtotal = (product.sale_price * Number(data.quantity));
-                const total =
-                    product.discount_type === "fixed"
-                        ? subtotal - (product.discount * Number(data.quantity))
-                        : subtotal - ((subtotal * Number(product.discount) / 100));
-                return {
-                    order_id: 0,
-                    product_id: product.id,
-                    product_name: product.name,
-                    sku: product.sku,
-                    quantity: Number(data.quantity),
-                    unit_price: product.sale_price,
-                    discount: Number(product.discount),
-                    discount_type: product.discount_type,
-                    subtotal,
-                    total,
-                }
-            }).filter(data => Boolean(data)) as OrderItem[]
-            if (orderItem.length == 0) {
-                return res._error(STATUS.NOT_FOUND, "Invalid product id !")
-            }
-            // order system only customar information 
-            const total = orderItem.reduce((pre: number, cur) => pre + Number(cur.total), 0);
-            const discount = orderItem.reduce((pre: number, cur) => pre + Number(cur.discount), 0);
-            // app model get for 
-            const dealivary = await deliveryHelper(delivary_area);
-            
-            const neworder: Order = {
-                customer_name,
-                customer_note,
-                customer_phone,
-                shipping_address,
-                order_number: `ORD-${Date.now()}-${String(fakeId(4)).padStart(4, "0")}`,
-                discount: discount,
-                due_amount: total,
-                total,
-                subtotal: (total + discount) - dealivary.charage,
-                payment_method: "Case One Delivery",
-                status: "pending",
-                id: 0,
-                delivary_area: dealivary.where,
-                delivary_charge: dealivary.charage
-            }
-            const successOrder = await OrderModel.table().insert(neworder);
-            const orderInformation = await OrderModel.find(successOrder[0]) as Order;
-            await OrderItemModel.table().insert(orderItem.map(data => ({ ...data, order_id: orderInformation.id })));
-            const orderItemInforamtion = await OrderItemModel.table().where("order_id", orderInformation.id);
-            const responce = {
-                ...orderInformation,
-                products: orderItemInforamtion
-            }
-            // cache
-            orderCache.set(responce);
-            return res._success(STATUS.OK, "order successfull", responce);
-        } catch (error) {
-            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error");
-        }
-    }
     update = async (req: Request, res: Response) => {
         try {
             const { customer_name, customer_note, customer_phone, shipping_address, admin_note } = req.body as OrderRequest;
@@ -124,8 +139,6 @@ export default new class OrdersController extends Controller {
             if (!customer_name || !customer_note || !customer_phone || !shipping_address) {
                 return res._error(STATUS.CONFLICT, "Customr input empty");
             }
-            await ProductModel.cachingOnModel();
-            await OrderModel.cachingOnModel();
             const checkOrder = orderCache.get(Number(id));
             if (!checkOrder) return res._error(STATUS.NOT_FOUND, "order not found");
             await OrderModel.table().where("id", id).update({
@@ -139,23 +152,11 @@ export default new class OrdersController extends Controller {
                 ...checkOrder, customer_name,
                 customer_note,
                 customer_phone,
-                shipping_address,
                 admin_note,
             })
             return res._success(STATUS.OK, "order update successfull");
         } catch (e) {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some serer error!");
-        }
-    }
-    invoice = async (req: Request, res: Response) => {
-        try {
-            const { id } = req.params;
-            await OrderModel.cachingOnModel();
-            const data = orderCache.getByOrderNumber(id.toString());
-            if (!data) return res._error(STATUS.NOT_FOUND, "invoice not found");
-            return res.status(200).json(this._success("order success", data));
-        } catch (e) {
-            return res.status(500).json(this._error("some error", { error: e instanceof Error ? e.message : "some serer errro" }));
         }
     }
     destroy = async (req: Request<{ id?: string }>, res: Response) => {

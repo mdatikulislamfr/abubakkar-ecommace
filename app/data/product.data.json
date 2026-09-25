@@ -1,0 +1,973 @@
+[
+    {
+        "id": 1,
+        "slug": "royal-soft-touch-sofa-cover",
+        "name": "রয়্যাল সফট টাচ সোফা কভার",
+        "description": "নরম ও আরামদায়ক ফ্যাব্রিকের আধুনিক সোফা কভার।",
+        "longDescription": [
+            "সফট ও আরামদায়ক ফ্যাব্রিক",
+            "সোফাকে ধুলো ও ময়লা থেকে সুরক্ষা দেয়",
+            "সহজে পরানো ও খোলা যায়",
+            "বাসার লিভিং রুমের জন্য উপযোগী"
+        ],
+        "price": 1290,
+        "oldPrice": 1490,
+        "discount": 10,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
+            "https://images.unsplash.com/photo-1550226891-ef816aed4a98?w=800&q=80"
+        ],
+        "brandId": "1",
+        "brandName": "No Brand",
+        "hasVariants": true,
+        "reciveImages": true,
+        "variants": [
+            {
+                "id": "v1-1",
+                "size": "1 Seater",
+                "price": 1290,
+                "oldPrice": 1490,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v1-2",
+                "size": "2 Seater",
+                "price": 1790,
+                "oldPrice": 2090,
+                "stock": 10,
+                "isAvailable": true
+            },
+            {
+                "id": "v1-3",
+                "size": "3 Seater",
+                "price": 2290,
+                "oldPrice": 2690,
+                "stock": 8,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "slug": "premium-velvet-sofa-cover",
+        "name": "প্রিমিয়াম ভেলভেট সোফা কভার",
+        "description": "অভিজাত ভেলভেট মেটেরিয়ালের প্রিমিয়াম সোফা কভার।",
+        "longDescription": [
+            "প্রিমিয়াম ভেলভেট মেটেরিয়াল",
+            "অ্যান্টি-স্লিপ গ্রিপ প্রযুক্তি",
+            "অভিজাত ও আধুনিক ডিজাইন",
+            "দীর্ঘস্থায়ী ও সহনশীল"
+        ],
+        "price": 1590,
+        "oldPrice": 1890,
+        "discount": 15,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80"
+        ],
+        "brandId": "1",
+        "brandName": "No Brand",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v2-1",
+                "size": "1 Seater",
+                "price": 1590,
+                "oldPrice": 1890,
+                "stock": 12,
+                "isAvailable": true
+            },
+            {
+                "id": "v2-2",
+                "size": "2 Seater",
+                "price": 2090,
+                "oldPrice": 2490,
+                "stock": 7,
+                "isAvailable": true
+            },
+            {
+                "id": "v2-3",
+                "size": "3 Seater",
+                "price": 2690,
+                "oldPrice": 3190,
+                "stock": 5,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "slug": "waterproof-sofa-protector",
+        "name": "ওয়াটারপ্রুফ সোফা কভার সেট",
+        "description": "পানি ও তরল প্রতিরোধক বিশেষ কভার।",
+        "longDescription": [
+            "১০০% ওয়াটারপ্রুফ স্প্যান্ডেক্স",
+            "বাচ্চা ও পোষা প্রাণীর জন্য নিরাপদ",
+            "সহজে পরিষ্কার করা যায়"
+        ],
+        "price": 1850,
+        "oldPrice": 2150,
+        "discount": 14,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=800&q=80"
+        ],
+        "brandId": "2",
+        "brandName": "SafeHome",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v3-1",
+                "size": "2 Seater",
+                "price": 1850,
+                "oldPrice": 2150,
+                "stock": 14,
+                "isAvailable": true
+            },
+            {
+                "id": "v3-2",
+                "size": "3 Seater",
+                "price": 2450,
+                "oldPrice": 2850,
+                "stock": 9,
+                "isAvailable": true
+            },
+            {
+                "id": "v3-3",
+                "size": "L-Shape Set",
+                "price": 3850,
+                "oldPrice": 4400,
+                "stock": 3,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "slug": "l-shape-corner-sofa-cover",
+        "name": "L-শেপ কর্নার সোফা কভার",
+        "description": "কর্নার বা এল-শেপ সোফার ফিটিং কভার।",
+        "longDescription": [
+            "২ টুকরার সম্পূর্ণ সেট",
+            "হাই-স্ট্রেচ ফ্যাব্রিক",
+            "স্মার্ট অ্যাডজাস্টেবল ডিজাইন"
+        ],
+        "price": 3200,
+        "oldPrice": 3700,
+        "discount": 13,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=800&q=80"
+        ],
+        "brandId": "1",
+        "brandName": "No Brand",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v4-1",
+                "size": "Standard L-Shape",
+                "price": 3200,
+                "oldPrice": 3700,
+                "stock": 6,
+                "isAvailable": true
+            },
+            {
+                "id": "v4-2",
+                "size": "XL L-Shape",
+                "price": 3700,
+                "oldPrice": 4200,
+                "stock": 0,
+                "isAvailable": false
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "slug": "printed-elastic-sofa-cover",
+        "name": "প্রিন্টেড ইলাস্টিক সোফা কভার",
+        "description": "ডিজিটাল প্রিন্টের আধুনিক ও কালারফুল কভার।",
+        "longDescription": [
+            "অ্যাট্রাক্টিভ ডিজিটাল প্রিন্ট",
+            "রং উঠার কোনো সম্ভাবনা নেই",
+            "মেশিন ওয়াশ উপযোগী"
+        ],
+        "price": 1350,
+        "oldPrice": 1600,
+        "discount": 15,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1567016432779-094069958ea5?w=800&q=80"
+        ],
+        "brandId": "3",
+        "brandName": "DecorCraft",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v5-1",
+                "size": "1 Seater",
+                "price": 1350,
+                "oldPrice": 1600,
+                "stock": 18,
+                "isAvailable": true
+            },
+            {
+                "id": "v5-2",
+                "size": "2 Seater",
+                "price": 1950,
+                "oldPrice": 2250,
+                "stock": 11,
+                "isAvailable": true
+            },
+            {
+                "id": "v5-3",
+                "size": "3 Seater",
+                "price": 2550,
+                "oldPrice": 2950,
+                "stock": 6,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "slug": "men-casual-slim-fit-cotton-shirt",
+        "name": "পুরুষদের ফুল স্লিভ ক্যাজুয়াল কটন শার্ট",
+        "description": "১০০% কটন মেটেরিয়ালের আরামদায়ক শার্ট।",
+        "longDescription": [
+            "১০০% প্রিমিয়াম প্রিকট সুতি",
+            "স্লিম ফিটিং ডিজাইন",
+            "সব ঋতুতে ব্যবহার উপযোগী"
+        ],
+        "price": 850,
+        "oldPrice": 1050,
+        "discount": 19,
+        "discountType": "percent",
+        "categoryId": "20",
+        "categoryName": "পুরুষদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80"
+        ],
+        "brandId": "4",
+        "brandName": "FabricsCo",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v6-1",
+                "size": "M",
+                "price": 850,
+                "oldPrice": 1050,
+                "stock": 25,
+                "isAvailable": true
+            },
+            {
+                "id": "v6-2",
+                "size": "L",
+                "price": 850,
+                "oldPrice": 1050,
+                "stock": 30,
+                "isAvailable": true
+            },
+            {
+                "id": "v6-3",
+                "size": "XL",
+                "price": 890,
+                "oldPrice": 1100,
+                "stock": 15,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "slug": "formal-oxford-cotton-shirt",
+        "name": "ফরমাল অক্সফোর্ড কটন শার্ট",
+        "description": "অফিস ও অফিশিয়াল প্রেজেন্টেশনের জন্য উপযুক্ত।",
+        "longDescription": [
+            "রিংকেল ফ্রি সহজে কুঁচকে যায় না",
+            "অক্সফোর্ড উইভ ফ্যাব্রিক",
+            "স্মার্ট কলার ডিজাইন"
+        ],
+        "price": 1150,
+        "oldPrice": 1350,
+        "discount": 14,
+        "discountType": "percent",
+        "categoryId": "20",
+        "categoryName": "পুরুষদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&q=80"
+        ],
+        "brandId": "4",
+        "brandName": "FabricsCo",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v7-1",
+                "size": "M (15)",
+                "price": 1150,
+                "oldPrice": 1350,
+                "stock": 12,
+                "isAvailable": true
+            },
+            {
+                "id": "v7-2",
+                "size": "L (15.5)",
+                "price": 1150,
+                "oldPrice": 1350,
+                "stock": 18,
+                "isAvailable": true
+            },
+            {
+                "id": "v7-3",
+                "size": "XL (16)",
+                "price": 1150,
+                "oldPrice": 1350,
+                "stock": 8,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "slug": "stretchable-denim-jeans-pants",
+        "name": "স্ট্রেচেবল ডেনিম জিন্স প্যান্ট",
+        "description": "স্টাইলিশ ও আরামদায়ক ব্লু ডেনিম জিন্স।",
+        "longDescription": [
+            "হাই কোয়ালিটি স্ট্রেচেবল ডেনিম",
+            "৫-পকেট ক্লাসিক মেটেরিয়াল",
+            "টেকসই জিপার ও বাটন"
+        ],
+        "price": 1450,
+        "oldPrice": 1750,
+        "discount": 17,
+        "discountType": "percent",
+        "categoryId": "20",
+        "categoryName": "পুরুষদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1542272604-780c36856842?w=800&q=80"
+        ],
+        "brandId": "5",
+        "brandName": "DenimLab",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v8-1",
+                "size": "30",
+                "price": 1450,
+                "oldPrice": 1750,
+                "stock": 10,
+                "isAvailable": true
+            },
+            {
+                "id": "v8-2",
+                "size": "32",
+                "price": 1450,
+                "oldPrice": 1750,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v8-3",
+                "size": "34",
+                "price": 1450,
+                "oldPrice": 1750,
+                "stock": 12,
+                "isAvailable": true
+            },
+            {
+                "id": "v8-4",
+                "size": "36",
+                "price": 1490,
+                "oldPrice": 1800,
+                "stock": 4,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "slug": "exclusive-cotton-panjabi",
+        "name": "এক্সক্লুসিভ কটন এমব্রয়ডারি পাঞ্জাবি",
+        "description": "ঈদের জন্য নিখুঁত সূচিকর্মের পাঞ্জাবি।",
+        "longDescription": [
+            "১০০% ফাইন সুতি কাপড",
+            "কলার ও বুকে সূক্ষ্ম কাজ",
+            "আরামদায়ক কাটিং"
+        ],
+        "price": 1850,
+        "oldPrice": 2200,
+        "discount": 15,
+        "discountType": "percent",
+        "categoryId": "20",
+        "categoryName": "পুরুষদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&q=80"
+        ],
+        "brandId": "6",
+        "brandName": "Heritage",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v9-1",
+                "size": "40",
+                "price": 1850,
+                "oldPrice": 2200,
+                "stock": 8,
+                "isAvailable": true
+            },
+            {
+                "id": "v9-2",
+                "size": "42",
+                "price": 1850,
+                "oldPrice": 2200,
+                "stock": 14,
+                "isAvailable": true
+            },
+            {
+                "id": "v9-3",
+                "size": "44",
+                "price": 1950,
+                "oldPrice": 2300,
+                "stock": 6,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "slug": "block-printed-three-piece",
+        "name": "উইমেন ব্লক প্রিন্টেড থ্রি-পিস",
+        "description": "হাতে তৈরি আকর্ষণীয় কালেকশনের কটন থ্রি-পিস।",
+        "longDescription": [
+            "হ্যান্ড ব্লক প্রিন্ট কাজ",
+            "সফট কটন সুতি ওড়না",
+            "রং ১০০% পাকা"
+        ],
+        "price": 1650,
+        "oldPrice": 1950,
+        "discount": 15,
+        "discountType": "percent",
+        "categoryId": "21",
+        "categoryName": "নারীদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&q=80"
+        ],
+        "brandId": "6",
+        "brandName": "Heritage",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v10-1",
+                "size": "Unstitched",
+                "price": 1650,
+                "oldPrice": 1950,
+                "stock": 25,
+                "isAvailable": true
+            },
+            {
+                "id": "v10-2",
+                "size": "Stitched (M)",
+                "price": 1950,
+                "oldPrice": 2300,
+                "stock": 8,
+                "isAvailable": true
+            },
+            {
+                "id": "v10-3",
+                "size": "Stitched (L)",
+                "price": 1950,
+                "oldPrice": 2300,
+                "stock": 10,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "slug": "women-casual-cotton-kurti",
+        "name": "ক্যাজুয়াল কটন কুর্তি",
+        "description": "দৈনন্দিন ব্যবহারে অত্যন্ত আরামদায়ক কুর্তি।",
+        "longDescription": [
+            "ডিজিটাল প্রিন্ট ডিজাইন",
+            "নিখুঁত সেলাই ও ফিনিশিং",
+            "সহজে পরিষ্কার যোগ্য"
+        ],
+        "price": 750,
+        "oldPrice": 950,
+        "discount": 21,
+        "discountType": "percent",
+        "categoryId": "21",
+        "categoryName": "নারীদের পোশাক",
+        "images": [
+            "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=800&q=80"
+        ],
+        "brandId": "3",
+        "brandName": "DecorCraft",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v11-1",
+                "size": "S",
+                "price": 750,
+                "oldPrice": 950,
+                "stock": 12,
+                "isAvailable": true
+            },
+            {
+                "id": "v11-2",
+                "size": "M",
+                "price": 750,
+                "oldPrice": 950,
+                "stock": 20,
+                "isAvailable": true
+            },
+            {
+                "id": "v11-3",
+                "size": "L",
+                "price": 750,
+                "oldPrice": 950,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v11-4",
+                "size": "XL",
+                "price": 790,
+                "oldPrice": 1000,
+                "stock": 6,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 12,
+        "slug": "breathable-running-shoes",
+        "name": "মেন্স লাইটওয়েট রানিং শু",
+        "description": "মেমরি ফোম সোলে তৈরি হালকা রানিং জুতো।",
+        "longDescription": [
+            "শক-অ্যাবসর্বিং রাবার সোল",
+            "বাতাস চলাচলের জন্য মেস আপার",
+            "খেলাধুলা ও হাটার জন্য সেরা"
+        ],
+        "price": 1690,
+        "oldPrice": 1990,
+        "discount": 15,
+        "discountType": "percent",
+        "categoryId": "22",
+        "categoryName": "জুতো",
+        "images": [
+            "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"
+        ],
+        "brandId": "7",
+        "brandName": "RunFast",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v12-1",
+                "size": "EU 40",
+                "price": 1690,
+                "oldPrice": 1990,
+                "stock": 8,
+                "isAvailable": true
+            },
+            {
+                "id": "v12-2",
+                "size": "EU 41",
+                "price": 1690,
+                "oldPrice": 1990,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v12-3",
+                "size": "EU 42",
+                "price": 1690,
+                "oldPrice": 1990,
+                "stock": 10,
+                "isAvailable": true
+            },
+            {
+                "id": "v12-4",
+                "size": "EU 43",
+                "price": 1750,
+                "oldPrice": 2050,
+                "stock": 4,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "slug": "leather-formal-dress-shoes",
+        "name": "লেদার ড্রেস ফরমাল শু",
+        "description": "খাঁটি চামড়ার প্রিমিয়াম অরিজিনাল জুতো।",
+        "longDescription": [
+            "১০০% জেনুইন লেদার",
+            "টেকসই ও আরামদায়ক সোকার",
+            "অফিস ও ক্লাসিক ব্যবহারের উপযোগী"
+        ],
+        "price": 2850,
+        "oldPrice": 3400,
+        "discount": 16,
+        "discountType": "percent",
+        "categoryId": "22",
+        "categoryName": "জুতো",
+        "images": [
+            "https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=800&q=80"
+        ],
+        "brandId": "8",
+        "brandName": "LeatherCraft",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v13-1",
+                "size": "EU 39",
+                "price": 2850,
+                "oldPrice": 3400,
+                "stock": 5,
+                "isAvailable": true
+            },
+            {
+                "id": "v13-2",
+                "size": "EU 40",
+                "price": 2850,
+                "oldPrice": 3400,
+                "stock": 9,
+                "isAvailable": true
+            },
+            {
+                "id": "v13-3",
+                "size": "EU 41",
+                "price": 2850,
+                "oldPrice": 3400,
+                "stock": 11,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 14,
+        "slug": "king-size-cotton-bed-sheet",
+        "name": "অল-কটন কিং সাইজ বেডশিট",
+        "description": "২ টি ম্যাচিং বালিশ কভার সহ কিং বেডশিট।",
+        "longDescription": [
+            "১০০% কটন প্রিমিয়াম সুতি",
+            "কিং সাইজ: ৭.৫ ফিট x ৮.৫ ফিট",
+            "রং কনে না বা ফ্যাকাশে হয় না"
+        ],
+        "price": 1150,
+        "oldPrice": 1400,
+        "discount": 17,
+        "discountType": "percent",
+        "categoryId": "23",
+        "categoryName": "হোম টেক্সটাইল",
+        "images": [
+            "https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=800&q=80"
+        ],
+        "brandId": "1",
+        "brandName": "No Brand",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v14-1",
+                "size": "Single (5x7 ft)",
+                "price": 750,
+                "oldPrice": 950,
+                "stock": 10,
+                "isAvailable": true
+            },
+            {
+                "id": "v14-2",
+                "size": "Queen (6.5x7.5 ft)",
+                "price": 950,
+                "oldPrice": 1150,
+                "stock": 14,
+                "isAvailable": true
+            },
+            {
+                "id": "v14-3",
+                "size": "King (7.5x8.5 ft)",
+                "price": 1150,
+                "oldPrice": 1400,
+                "stock": 18,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "slug": "orthopedic-memory-foam-pillow",
+        "name": "অর্থোপেডিক মেমরি ফোম পিলৌ",
+        "description": "ঘাড়ের ব্যথা উপশমকারী মেমরি ফোম বালিশ।",
+        "longDescription": [
+            "মেডিকেল গ্রেড মেমরি ফোম",
+            "ঘাড় ও মেরুদণ্ডের জন্য উপযোগী",
+            "ওয়াশেবল রিমুভেবল কভার"
+        ],
+        "price": 1250,
+        "oldPrice": 1500,
+        "discount": 16,
+        "discountType": "percent",
+        "categoryId": "23",
+        "categoryName": "হোম টেক্সটাইল",
+        "images": [
+            "https://images.unsplash.com/photo-1584100936595-c0654b55a2e6?w=800&q=80"
+        ],
+        "brandId": "9",
+        "brandName": "ComfortSleep",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v15-1",
+                "size": "Standard",
+                "price": 1250,
+                "oldPrice": 1500,
+                "stock": 20,
+                "isAvailable": true
+            },
+            {
+                "id": "v15-2",
+                "size": "Large Contour",
+                "price": 1550,
+                "oldPrice": 1850,
+                "stock": 12,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 16,
+        "slug": "smart-watch-ultra-display",
+        "name": "স্মার্টওয়াচ আল্ট্রা ডিসপ্লে",
+        "description": "ফিটনেস ও হেলথ ট্র্যাকিং সহ HD স্মার্টওয়াচ।",
+        "longDescription": [
+            "হার্ট রেট ও স্লিপ মনিটর",
+            "৭ দিনের ব্যাটারি ব্যাকআপ",
+            "ওয়াটারপ্রুফ ডিজাইন"
+        ],
+        "price": 2490,
+        "oldPrice": 2990,
+        "discount": 16,
+        "discountType": "percent",
+        "categoryId": "24",
+        "categoryName": "গ্যাজেট",
+        "images": [
+            "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&q=80"
+        ],
+        "brandId": "10",
+        "brandName": "TechPro",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v16-1",
+                "size": "41mm Strap",
+                "price": 2490,
+                "oldPrice": 2990,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v16-2",
+                "size": "45mm Strap",
+                "price": 2690,
+                "oldPrice": 3190,
+                "stock": 9,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 17,
+        "slug": "anc-wireless-earbuds",
+        "name": "ওয়ারলেস ANC ইয়ারবাডস",
+        "description": "একটিভ নয়েজ ক্যানসেলেশন ও বেস হেডফোন।",
+        "longDescription": [
+            "ANC নয়েজ ক্যানসেলেশন",
+            "টাইপ-সি ফাস্ট চার্জিং",
+            "স্পিয়ার ক্লিয়ার কলিং"
+        ],
+        "price": 1850,
+        "oldPrice": 2300,
+        "discount": 19,
+        "discountType": "percent",
+        "categoryId": "24",
+        "categoryName": "গ্যাজেট",
+        "images": [
+            "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80"
+        ],
+        "brandId": "10",
+        "brandName": "TechPro",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v17-1",
+                "size": "Standard Case",
+                "price": 1850,
+                "oldPrice": 2300,
+                "stock": 25,
+                "isAvailable": true
+            },
+            {
+                "id": "v17-2",
+                "size": "Wireless Charging Case",
+                "price": 2250,
+                "oldPrice": 2700,
+                "stock": 7,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 18,
+        "slug": "water-resistant-laptop-backpack",
+        "name": "ওয়াটার রেজিস্ট্যান্ট ল্যাপটপ ব্যাকপ্যাক",
+        "description": "১৫.৬ ইঞ্চি ল্যাপটপ প্যাডেড সহ স্মার্ট ব্যাকপ্যাক।",
+        "longDescription": [
+            "ল্যাপটপ প্রোটেকশন চেম্বার",
+            "ইউএসবি চার্জিং পোর্ট",
+            "ওয়াটারপ্রুফ মেটেরিয়াল"
+        ],
+        "price": 1450,
+        "oldPrice": 1800,
+        "discount": 19,
+        "discountType": "percent",
+        "categoryId": "25",
+        "categoryName": "ব্যাগ",
+        "images": [
+            "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80"
+        ],
+        "brandId": "11",
+        "brandName": "GearUp",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v18-1",
+                "size": "25 Liters",
+                "price": 1450,
+                "oldPrice": 1800,
+                "stock": 14,
+                "isAvailable": true
+            },
+            {
+                "id": "v18-2",
+                "size": "35 Liters",
+                "price": 1750,
+                "oldPrice": 2100,
+                "stock": 8,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 19,
+        "slug": "genuine-leather-men-wallet",
+        "name": "পুরুষদের খাঁটি চামড়ার ওয়ালেট",
+        "description": "RFID সিকিউরিটি লক সহ লেদার মানিব্যাগ।",
+        "longDescription": [
+            "RFID কার্ড প্রোটেকশন",
+            "খাঁটি গরুর চামড়া",
+            "মাল্টিপল কার্ড স্লট"
+        ],
+        "price": 650,
+        "oldPrice": 850,
+        "discount": 23,
+        "discountType": "percent",
+        "categoryId": "25",
+        "categoryName": "ব্যাগ",
+        "images": [
+            "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&q=80"
+        ],
+        "brandId": "8",
+        "brandName": "LeatherCraft",
+        "hasVariants": true,
+        "variants": [
+            {
+                "id": "v19-1",
+                "size": "Slim Bi-Fold",
+                "price": 650,
+                "oldPrice": 850,
+                "stock": 30,
+                "isAvailable": true
+            },
+            {
+                "id": "v19-2",
+                "size": "Zipper Tri-Fold",
+                "price": 790,
+                "oldPrice": 990,
+                "stock": 12,
+                "isAvailable": true
+            }
+        ]
+    },
+    {
+        "id": 20,
+        "slug": "premium-jacquard-sofa-cover",
+        "name": "প্রিমিয়াম জ্যাকার্ড সোফা কভার",
+        "description": "প্রিমিয়াম জ্যাকার্ড ফ্যাব্রিকের আকর্ষণীয় সোফা কভার।",
+        "longDescription": [
+            "প্রিমিয়াম জ্যাকার্ড ফ্যাব্রিক",
+            "আকর্ষণীয় টেক্সচার",
+            "সোফাকে নতুন ও প্রিমিয়াম লুক দেয়",
+            "দীর্ঘদিন ব্যবহারের জন্য উপযোগী"
+        ],
+        "price": 2290,
+        "oldPrice": 2790,
+        "discount": 18,
+        "discountType": "percent",
+        "categoryId": "15",
+        "categoryName": "সোফা কভার",
+        "images": [
+            "https://images.unsplash.com/photo-1550226891-ef816aed4a98?w=800&q=80",
+            "https://images.unsplash.com/photo-1567016432779-094069958ea5?w=800&q=80"
+        ],
+        "brandId": "1",
+        "brandName": "No Brand",
+        "hasVariants": true,
+        "reciveImages": true,
+        "variants": [
+            {
+                "id": "v20-1",
+                "size": "1 Seater",
+                "price": 1490,
+                "oldPrice": 1790,
+                "stock": 15,
+                "isAvailable": true
+            },
+            {
+                "id": "v20-2",
+                "size": "2 Seater",
+                "price": 1890,
+                "oldPrice": 2290,
+                "stock": 10,
+                "isAvailable": true
+            },
+            {
+                "id": "v20-3",
+                "size": "3 Seater",
+                "price": 2290,
+                "oldPrice": 2790,
+                "stock": 8,
+                "isAvailable": true
+            },
+            {
+                "id": "v20-4",
+                "size": "4 Seater",
+                "price": 2790,
+                "oldPrice": 3290,
+                "stock": 5,
+                "isAvailable": true
+            }
+        ]
+    }
+]

@@ -1,7 +1,10 @@
 import { Knex } from "knex";
-import product from '../../app/data/product.json' with  {type: "json"}
-export async function seed(knex: Knex): Promise<void> {
-    await knex("products").del();
-    await knex("products").insert(product)
+import { Product } from "../../@types/table.js";
 
+export async function seed(knex: Knex): Promise<void> {
+    // আগের সব প্রোডাক্ট মুছে ফেলা হচ্ছে
+    await knex("products").del();
+    const prodcuts: Product[] = [] 
+    // products টেবিলে ডেটা ইনসার্ট করা হলো
+    await knex("products").insert(prodcuts);
 }

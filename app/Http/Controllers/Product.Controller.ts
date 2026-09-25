@@ -1,83 +1,142 @@
 import { Request, Response } from "express";
-import { Product } from "../../../@types/table.js";
+import { Product, ProductVariant } from "../../../@types/table.js";
 import STATUS from "../../../config/status.js";
 import generateBarcode from "../../helpers/generateBarcode.js";
-import { BrandModel } from "../../Models/brand.model.js";
-import { CategoryModel } from "../../Models/categorys.model.js";
 import { ProductModel } from "../../Models/products.model.js";
 import Controller from "./Controller.js";
-import slugify from 'slugify'
-import { ProductReponce } from "../../../@types/index.js";
 import productCache from "../../cache/product.cache.js";
-const productImages = [
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600",
-    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600",
-    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600",
-    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600",
-];
+import path from "path";
+import { Worker } from "worker_threads";
+import { ProductImagesModel } from "../../Models/products_iamges.model.js";
+import { createProduct } from "../../helpers/products/prodcut.js";
+import multer from "../../../config/multer.js";
+import { createImages } from "../../helpers/products/productImage.js";
+import { createVarient } from "../../helpers/products/productVaiants.js";
+import { VarientModel } from "../../Models/varient.model.js";
+const workerPath = path.join(process.cwd(), 'app/Worker/imageWorker.js');
+
 export default new class ProductController extends Controller {
-    getQuery = () => ProductModel.joinProducts()
-    index = async (req: Request<{ id?: string, slug?: string }>, res: Response) => {
+    // create prodcut
+    add = async (req: Request, res: Response) => {
         try {
+            const { categoryId, brandId, name, slug, description, sku, title, status, variants } = req.body;
+            if (!categoryId || !brandId || !name || !slug || !title || !sku) {
+                return res._error(STATUS.BAD_REQUEST, "input data empty");
+            }
+            const productVerients: ProductVariant[] = JSON.parse(variants);
+            if (!Array.isArray(productVerients) || productVerients.length == 0) {
+                return res._error(STATUS.BAD_REQUEST, "product varients field now empty");
+            }
+            const productObject: Product = { category_id: categoryId, brand_id: brandId, name, slug, sku, description, title, unit: "pc", status, id: 1 };
 
-            const id = req.params.id || req.query.id;
-            const slug = req.params.slug || req.query.slug;
-            let ti = "serevr";
-            let products: Product[] = [];
-            if (!productCache.isInitialized()) {
-                products = await this.getQuery().orderBy("products.id", "desc");
-                productCache.setAll(products);
-            } else {
-                ti = "case";
-                products = productCache.getAll();
-            }
-            // search
-            if (id) {
-                const itemProduct = productCache.get(Number(id));
-                products = itemProduct ? [itemProduct] : [];
-            } else if (slug) {
-                const itemProduct = productCache.getBySlug(slug.toString());
-                products = itemProduct ? [itemProduct] : [];
-            }
-            if (products.length == 0) {
-                return res._error(STATUS.NOT_FOUND, "Product not found!");
-            }
-
-            const productList: ProductReponce[] = products.map((data: Product) => {
+            const newProduct: Product = await createProduct(productObject);
+            const newVarients: ProductVariant[] = productVerients.map((data) => {
                 return {
-                    id: data?.id || 0,
-                    slug: data?.slug || "0",
-                    name: data.name,
-                    description: data?.description || "",
-                    specification: [
-                        "USB রিচার্জেবল সিস্টেম – যেকোনো পাওয়ার ব্যাংক বা অ্যাডাপ্টারে চার্জ করা যায়।",
-                        "শক্তিশালী মোটর – গভীর টিস্যু মাসাজ নিশ্চিত করে।",
-                        "হালকা এবং পোর্টেবল – ব্যাগে খুব সহজেই বহনযোগ্য।",
-                    ] as string[],
-                    price: Number(data.sale_price) || 0,
-                    oldPrice: 0,
-                    discount: Number(data.discount),
-                    discount_type: data.discount_type,
-                    categoryId: Number(data.category_id),
-                    categoryName: data.categorie_name || "",
-                    images: [productImages[Math.floor(Math.random() * productImages.length)]] as string[],
-                    rating: 1.5,
-                    reviewCount: 1,
-                    stock: data.stock,
-                    brand: data.brand_name || "",
-                    featured: true,
-                    bestSelling: true,
-                    newArrival: true,
-                    createdAt: data.created_at
-                        ? new Date(data.created_at).toISOString()
-                        : "",
+                    ...data,
+                    product_id: newProduct.id || 0,
                 }
             })
-
-            return res._success(STATUS.OK, `product list ${ti}`, productList.length == 1 ? productList[0] : productList);
+            await createVarient(newVarients)
+            if (req.file) {
+                // add product image
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        outputPath: multer.path.upload("/")
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    try {
+                        if (result.name) {
+                            await createImages({
+                                id: 1,
+                                for: "product",
+                                image: result.name,
+                                is_primary: true,
+                                product_id: newProduct.id || 0,
+                                sort_order: 1,
+                                status: true,
+                            })
+                        }
+                    } catch (error) {
+                        return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : String(error));
+                    }
+                })
+            }
+            productCache.set(newProduct);
+            const send = await ProductModel.clientresponce([newProduct]);
+            return res._success(STATUS.CREATED, "product create successfull", send[0]);
         } catch (error) {
-            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "some error");
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : String(error));
+        }
+    }
+    // get
+    get = async (req: Request, res: Response) => {
+        try {
+            const slug = req.query.slug || req.params.slug;
+            // all data
+            let products: Product[] = [];
+            let single: boolean = false;
+            if (slug) {
+                products = await ProductModel.joinProducts().andWhere("products.slug", "=", slug.toString().trim() || "");
+                single = true;
+            } else {
+                products = productCache.getAll();
+                single = false;
+            }
+            if (!products || products.length == 0) return res._error(STATUS.NOT_FOUND, "Product list not found!");
+            const product = await ProductModel.clientresponce(products);
+            return res._success(STATUS.OK, "product list", single ? product[0] : product);
+        } catch (error) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
+        }
+    }
+    // upload product imaeg
+    upload = async (req: Request, res: Response) => {
+        try {
+            const id = req.params.id;
+            if (!id) return res._error(STATUS.NOT_FOUND, "product id not found");
+            const findProduct = await ProductModel.find(Number(id)) as Product;
+            if (!findProduct) return res._error(STATUS.NOT_FOUND, "Product not found!");
+            //  images prosessing
+            if (!req.file?.buffer) {
+                return res._error(STATUS.BAD_REQUEST, "Image file is required!");
+            }
+            const imageProcessing = new Worker(workerPath, {
+                workerData: {
+                    inputPath: req.file?.buffer,
+                    outputPath: multer.path.storage("/uploads"),
+                }
+            })
+            imageProcessing.on('error', (err) => {
+                if (!res.headersSent) {
+                    return res._error(STATUS.INTERNAL_SERVER_ERROR, "Image Processing Failed: " + String(err));
+                }
+            });
+            imageProcessing.on('message', async (result) => {
+                if (!res.headersSent) {
+                    if (result.success) {
+                        try {
+                            await createImages({
+                                id: 1,
+                                product_id: findProduct.id || 0,
+                                for: "product",
+                                image: result.name,
+                                is_primary: false,
+                                sort_order: 1,
+                                status: true,
+                            })
+                            return res._success(STATUS.CREATED, "images upload successfully");
+                        } catch (dbError) {
+                            return res._error(STATUS.INTERNAL_SERVER_ERROR, "Database Error: " + String(dbError));
+                        }
+                    } else {
+                        return res._error(STATUS.INTERNAL_SERVER_ERROR, "Processing failed: " + result.error);
+                    }
+                }
+            });
+        } catch (error) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
         }
     }
     barcode = async (req: Request<{ text?: string }>, res: Response) => {
@@ -94,141 +153,87 @@ export default new class ProductController extends Controller {
             return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
         }
     }
-    create = async (req: Request, res: Response) => {
-        try {
-            const product = req.body as Product;
-            const slug = slugify(product.slug.trim(), {
-                lower: true,
-                trim: true,
-            });
-            // check slug
-            const haveSlug = await ProductModel.table().where("slug", "=", slug).first();
-            if (haveSlug) return res._error(STATUS.CONFLICT, `${slug} alredy have!`);
-            // check category
-            const haveCategory = await CategoryModel.table().where("id", product.category_id).first();
-            if (!haveCategory) return res._error(STATUS.NOT_FOUND, "Category not found!");
-            // check brnad
-            const haveBrand = await BrandModel.table().where("id", product.brand_id).first();
-            if (!haveBrand) return res._error(STATUS.NOT_FOUND, "Brand not found!");
-
-            // new product model
-            const newProduct: Product = {
-                ...product,
-                slug,
-                barcode: product.sku,
-
-            }
-            // insert product with database
-            const [insertId] = await ProductModel.table().insert(newProduct);
-            const newProductData = await this.getQuery().where("products.id", "=", insertId).first() as Product;
-            // cache data on cache systems
-            productCache.set(newProductData);
-            return res._success(STATUS.CREATED, "success data", newProductData);
-        } catch (error) {
-            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : "server error !")
-        }
-    }
-    update = async (req: Request<{ id?: string }, "", Partial<Product>>, res: Response) => {
+    update = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-
-            // check product
-            const product = await ProductModel
-                .table()
-                .where("id", Number(id))
-                .first();
-
-            if (!product) {
-                return res._error(STATUS.NOT_FOUND, "Product not found!");
+            if (!id) {
+                return res._error(STATUS.BAD_REQUEST, "Product ID is required for update");
             }
-
-            const data = req.body;
-
-            // check slug
-            if (data.slug !== undefined) {
-                const slug = slugify(data.slug.trim(), {
-                    lower: true,
-                    trim: true,
-                });
-
-                const haveSlug = await ProductModel
-                    .table()
-                    .where("slug", slug)
-                    .whereNot("id", Number(id))
-                    .first();
-
-                if (haveSlug) {
-                    return res._error(STATUS.CONFLICT, `${slug} alredy have!`);
-                }
-
-                data.slug = slug;
+            const { categoryId, brandId, name, slug, description, sku, title, status, variants } = req.body;
+            if (!categoryId || !brandId || !name || !slug || !title || !sku) {
+                return res._error(STATUS.BAD_REQUEST, "input data empty");
             }
-
-            // check category
-            if (data.category_id !== undefined) {
-                const haveCategory = await CategoryModel
-                    .table()
-                    .where("id", data.category_id)
-                    .first();
-                if (!haveCategory) {
-                    return res._error(STATUS.NOT_FOUND, "Category not found!");
+            let productVerients: ProductVariant[] = [];
+            if (variants) {
+                productVerients = JSON.parse(variants);
+                if (!Array.isArray(productVerients) || productVerients.length == 0) {
+                    return res._error(STATUS.BAD_REQUEST, "product varients field now empty");
                 }
             }
-
-            // check brand
-            if (data.brand_id !== undefined) {
-                const haveBrand = await BrandModel
-                    .table()
-                    .where("id", data.brand_id)
-                    .first();
-
-                if (!haveBrand) {
-                    return res._error(STATUS.NOT_FOUND, "Brand not found!");
-                }
-            }
-
-            // update product
-            const updatedProduct = {
-                ...data,
-                updated_at: new Date().toISOString(),
+            const productObject: Product = {
+                id: Number(id),
+                unit: "pc",
+                category_id: categoryId,
+                brand_id: brandId,
+                name,
+                slug,
+                sku,
+                description,
+                title,
+                status
             };
-
-            await ProductModel
-                .table()
-                .where("id", Number(id))
-                .update(updatedProduct);
-
-
-            const newProductData = await this.getQuery().where("products.id", "=", id!).first() as Product;
-            // cache data on cache systems
-            productCache.set(newProductData);
-
-            return res._success(
-                STATUS.OK,
-                "Product updated successfully!",
-                newProductData
-            );
+            const updateProduct = await ProductModel.update(productObject);
+            productCache.set(updateProduct);
+            // varient update
+            if (productVerients.length > 0) {
+                const newVarients: ProductVariant[] = productVerients.map((data) => {
+                    return {
+                        ...data,
+                        product_id: Number(id),
+                    }
+                })
+                await VarientModel.update(Number(id), newVarients);
+            }
+            if (req.file) {
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        outputPath: multer.path.upload("/")
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    try {
+                        if (result.name) {
+                            await ProductImagesModel.create({
+                                for: "product",
+                                id: 1,
+                                image: result.name,
+                                is_primary: true,
+                                product_id: Number(id),
+                                sort_order: 1,
+                                status: true,
+                            })
+                        }
+                    } catch (error) {
+                        console.error("Image Processing DB Error: ", error);
+                    }
+                })
+            }
+            const product = await ProductModel.clientresponce([updateProduct]);
+            return res._success(STATUS.OK, "product updated successfully", product[0]);
         } catch (error) {
-            return res._error(
-                STATUS.INTERNAL_SERVER_ERROR,
-                error instanceof Error
-                    ? error.message
-                    : "server error !"
-            );
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : String(error));
         }
-    };
+    }
     destroy = async (req: Request<{ id?: string }>, res: Response) => {
         try {
             const { id } = req.params;
-
             // check product
             const product = await ProductModel.table()
                 .where("id", Number(id))
                 .whereNull("deleted_at")
                 .first();
-
             if (!product) return res._error(STATUS.NOT_FOUND, "Product not found!");
-
             // delete product
             await ProductModel.table()
                 .where("id", Number(id))
@@ -245,4 +250,18 @@ export default new class ProductController extends Controller {
             );
         }
     };
+    // landing page
+    landingPage = async (req: Request, res: Response) => {
+        try {
+            const prodcut = productCache.getBySlug(req.params.slug.toString());
+            if (!prodcut) return res._error(STATUS.BAD_REQUEST, "Product not found");
+            const page = (await ProductModel.clientresponce([prodcut]))[0];
+            return res._success(STATUS.OK, "landing page", page);
+        } catch (error) {
+            return res._error(
+                STATUS.INTERNAL_SERVER_ERROR,
+                error instanceof Error ? error.message : "server error !"
+            );
+        }
+    }
 }

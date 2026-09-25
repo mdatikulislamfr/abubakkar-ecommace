@@ -64,7 +64,7 @@
       "routes/**/*.ts",
       "src/**/*.ts",
       "@types/**/*.ts"
-   ],
+, "production.ts"   ],
    "exclude": [
       "node_modules",
       "dist",

@@ -1,19 +1,22 @@
 import { Knex } from "knex";
+import { App } from "../../@types/table.js";
+
 export async function seed(knex: Knex): Promise<void> {
     await knex("app").del();
-    await knex("app").insert({
-        "name": "টাইমবাজ",
-        "title": "টাইমবাজ - আপনার সময়, আপনার স্টাইল",
-        "insite_dhaka": 70,
-        "outsite_dhaka": 120,
-        "email": "support@timebaj.com",
-        "location": "মিরপুর, ঢাকা, বাংলাদেশ",
-        "phone": "+8801700000000",
-        "facebook": "https://facebook.com/timebaj",
-        "linkdin": "https://linkedin.com/company/timebaj",
-        "logo": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500",
-        "status": true,
-        "messager": "https://m.me/timebaj",
-        "youtube": "https://youtube.com/@timebaj"
-    })
+    const data: App = {
+        id: 1,
+        name: "SOFA COVER MARTE",
+        title: "SCM - আপনাদের সেবায় বাংলাদেশের সেরা সোফা কভার।",
+        logo: "app.",
+        insite_dhaka: 70,
+        outsite_dhaka: 120,
+        email: "sofacovermart@gmail.com",
+        location: "নদ্দা, ঢাকা-১২১২, বাংলাদেশ",
+        phone: "+8801603495510",
+        facebook: "https://facebook.com/ecommercebd",
+        status: true,
+        created_at: new Date(), // Required field
+        updated_at: new Date()  // Required field
+    };
+    await knex("app").insert([data]);
 }

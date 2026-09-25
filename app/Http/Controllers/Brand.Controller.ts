@@ -1,521 +1,167 @@
 import { Request, Response } from "express";
 import slugify from "slugify";
-
 import { Brand } from "../../../@types/table.js";
-
 import Controller from "./Controller.js";
-import { _error, _success } from "../../helpers/appHelper.js";
+import { empty } from "../../helpers/appHelper.js";
 import STATUS from "../../../config/status.js";
 import { BrandModel } from "../../Models/brand.model.js";
-import { ActivityLogsModel } from "../../Models/activity_logs.model.js";
+import brandCache from "../../cache/brand.cache.js";
+import path from "path";
+import { Worker } from "worker_threads";
+import multer from "../../../config/multer.js";
+const workerPath = path.join(process.cwd(), 'app/Worker/imageWorker.js');
 
-export default new (class BrandController extends Controller {
 
-    /**
-     * Get all brands.
-     *
-     * Supports:
-     * - Pagination
-     * - Search by brand name
-     * - Sorting
-     */
+export default new class BrandController extends Controller {
     index = async (req: Request, res: Response) => {
         try {
-            const page = Math.max(Number(req.query.page) || 1, 1);
-            const limit = Math.min(
-                Math.max(Number(req.query.limit) || 20, 1),
-                100
-            );
-
-            const offset = (page - 1) * limit;
-            const search = String(req.query.search || "").trim();
-
-            const query = BrandModel.table();
-
-            if (search) {
-                query.where("name", "like", `%${search}%`);
-            }
-
-            // const [{ total }] = await query
-            //     .clone()
-            //     .clearSelect()
-            //     .clearOrder()
-            //     .count<{ total: number }>("id as total");
-
-            const brands = await query
-                .select("*")
-                .whereNull("deleted_at")
-                .orderBy("sort_order", "asc")
-                .orderBy("id", "desc")
-                .limit(limit)
-                .offset(offset);
-
-            return res
-                .status(STATUS.OK)
-                .json(
-                    _success({
-                        message: "Brands retrieved successfully",
-                        data: brands,
-                        // meta: {
-                        //     page,
-                        //     limit,
-                        //     total: Number(total),
-                        //     totalPages: Math.ceil(Number(total) / limit),
-                        // },
-                    })
-                );
-
-        } catch (error) {
-            return res
-                .status(STATUS.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
-        }
-    };
-
-    /**
-     * Get a single brand by ID.
-     */
-    show = async (req: Request, res: Response) => {
-        try {
             const { id } = req.params;
-
-            const brand = await BrandModel
-                .table()
-                .where("id", id)
-                .whereNull("deleted_at")
-                .first();
-
-            if (!brand) {
-                return res
-                    .status(STATUS.NOT_FOUND)
-                    .json(
-                        _error({
-                            message: "Brand not found",
-                        })
-                    );
-            }
-
-            return res
-                .status(STATUS.OK)
-                .json(
-                    _success({
-                        message: "Brand retrieved successfully",
-                        data: brand,
-                    })
-                );
-
-        } catch (error) {
-            return res
-                .status(STATUS.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
+            const data = id ? [brandCache.get(Number(id))] : brandCache.getAll();
+            if (data.length == 0) return res._error(STATUS.NOT_FOUND, "data not found");
+            const send = BrandModel.clientresponce((data || []) as Brand[]);
+            return res._success(STATUS.OK, "Successfull", send);
+        } catch (e) {
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, e instanceof Error ? e.message : "some error");
         }
-    };
-
-    /**
-     * Create a new brand.
-     *
-     * Steps:
-     * 1. Validate brand name.
-     * 2. Generate a unique slug.
-     * 3. Check for duplicate slug.
-     * 4. Insert the brand.
-     * 5. Create activity log.
-     * 6. Return the newly created brand.
-     */
+    }
     create = async (req: Request, res: Response) => {
         try {
-            const {
-                name,
-                code,
-                description,
-                logo,
-                website,
-                sort_order,
-                status,
-                slug
-            } = req.body;
-
-            if (
-                !name?.trim() ||
-                !description?.trim() ||
-                !website ||
-                !code ||
-                !logo ||
-                !sort_order ||
-                !status ||
-                !slug
-            ) {
-                return res
-                    .status(STATUS.BAD_REQUEST)
-                    .json(
-                        _error({
-                            message:
-                                "Brand name, description, website is required",
-                        })
-                    );
+            const { name, website, sort_order, status, slug } = req.body as Brand;
+            if (empty(name) || empty(slug)) {
+                return res._error(STATUS.BAD_REQUEST, "Brand name and slug are required");
             }
-
             const cleanName = name.trim();
-
-
-            const existing = await BrandModel
-                .table()
-                .where("slug", slug.trim())
-                .first();
-
+            const cleanSlug = slugify(slug.trim(), { lower: true, trim: true });
+            const existing = await BrandModel.table().where("slug", cleanSlug).first();
             if (existing) {
-                return res
-                    .status(STATUS.CONFLICT)
-                    .json(
-                        _error({
-                            message: "A brand with this name already exists",
-                        })
-                    );
+                return res._error(STATUS.CONFLICT, "A brand with this slug already exists");
             }
-
-            const newBrand: Brand = {
+            const newBrandData = {
                 name: cleanName,
-                slug,
-                code: code ?? null,
-                description: description ?? null,
-                logo: logo ?? null,
-                website,
+                slug: cleanSlug,
+                website: website || null,
                 sort_order: sort_order ?? 0,
                 status: status ?? true,
             };
-
-            const [insertedId] = await BrandModel
-                .table()
-                .insert(newBrand);
-
-            const brand = await BrandModel
-                .table()
-                .where("id", insertedId)
-                .first();
-
-            /**
-             * Create activity log.
-             */
-            await ActivityLogsModel
-                .table()
-                .insert({
-                    user_id: req.user?.id ?? null,
-                    action: "created",
-                    subject_type: "Brand",
-                    subject_id: insertedId,
-                    description: `Brand "${cleanName}" created successfully`,
-                    old_values: null,
-                    new_values: JSON.stringify(brand),
-                    ip_address: req.ip,
-                    user_agent: req.get("user-agent") ?? null,
+            const [insertId] = await BrandModel.table().insert(newBrandData);
+            if (!insertId) {
+                return res._error(STATUS.INTERNAL_SERVER_ERROR, " Failed to create brand");
+            }
+            const brand = await BrandModel.find(insertId) as Brand;
+            brandCache.set(brand);
+            // file upload
+            const file = req.file;
+            if (file) {
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        label: true,
+                        outputPath: multer.path.upload()
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    if (result.success) {
+                        await BrandModel.table().where({ id: insertId }).update({ logo: result.name })
+                        const sliderx = await BrandModel.find(insertId);
+                        sliderx.image = result.name;
+                        brandCache.set(sliderx);
+                    }
                 });
-
-            return res
-                .status(STATUS.CREATED)
-                .json(
-                    _success({
-                        message: "Brand created successfully",
-                        data: brand,
-                    })
-                );
-
+            }
+            const send = BrandModel.clientresponce([brand]);
+            return res._success(STATUS.CREATED, " Brand created successfully", send);
         } catch (error) {
-            return res
-                .status(STATUS.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
+            return res._error(STATUS.INTERNAL_SERVER_ERROR, error instanceof Error ? error.message : String(error));
         }
-    };
-
-    /**
-     * Update an existing brand.
-     *
-     * PATCH behavior:
-     * Only fields provided by the client are updated.
-     */
+    }
     update = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-
-            const brand = await BrandModel
-                .table()
-                .where("id", id)
-                .whereNull("deleted_at")
-                .first();
-
-            if (!brand) {
-                return res
-                    .status(STATUS.NOT_FOUND)
-                    .json(
-                        _error({
-                            message: "Brand not found",
-                        })
-                    );
+            if (empty(id)) {
+                return res._error(STATUS.BAD_REQUEST, "ID is required");
             }
+            const brand = await BrandModel.find(Number(id));
+            if (!brand) {
+                return res._error(STATUS.NOT_FOUND, "Brand not found");
+            }
+            const { name, website, sort_order, status } = req.body as Partial<Brand>;
+            const updateData: Record<string, unknown> = {};
+            if (!empty(name)) {
+                const cleanName = name!.trim();
+                const cleanSlug = slugify(cleanName, { lower: true, trim: true });
 
-            const {
-                name,
-                code,
-                description,
-                logo,
-                website,
-                sort_order,
-                status,
-            } = req.body;
-
-            const updateData: Partial<Brand> & {
-                updated_at?: Date;
-            } = {};
-
-            /**
-             * Update name and regenerate slug
-             * only when a new name is provided.
-             */
-            if (name !== undefined) {
-                if (!name.trim()) {
-                    return res
-                        .status(STATUS.BAD_REQUEST)
-                        .json(
-                            _error({
-                                message: "Brand name cannot be empty",
-                            })
-                        );
-                }
-
-                const cleanName = name.trim();
-
-                const slug = slugify(cleanName, {
-                    lower: true,
-                    strict: true,
-                    trim: true,
-                });
-
-                if (!slug) {
-                    return res
-                        .status(STATUS.BAD_REQUEST)
-                        .json(
-                            _error({
-                                message: "Unable to generate brand slug",
-                            })
-                        );
-                }
-
-                const existing = await BrandModel
-                    .table()
-                    .where("slug", slug)
+                const existing = await BrandModel.table()
+                    .where("slug", cleanSlug)
                     .whereNot("id", id)
                     .first();
 
                 if (existing) {
-                    return res
-                        .status(STATUS.CONFLICT)
-                        .json(
-                            _error({
-                                message:
-                                    "A brand with this name already exists",
-                            })
-                        );
+                    return res._error(STATUS.CONFLICT, "A brand with this slug already exists");
                 }
 
                 updateData.name = cleanName;
-                updateData.slug = slug;
+                updateData.slug = cleanSlug;
             }
-
-            if (code !== undefined) {
-                updateData.code = code;
-            }
-
-            if (description !== undefined) {
-                updateData.description = description;
-            }
-
-            if (logo !== undefined) {
-                updateData.logo = logo;
-            }
-
-            if (website !== undefined) {
-                updateData.website = website;
-            }
-
-            if (sort_order !== undefined) {
-                updateData.sort_order = sort_order;
-            }
-
-            if (status !== undefined) {
-                updateData.status = status;
-            }
-
+            if (website !== undefined) updateData.website = website || null;
+            if (sort_order !== undefined) updateData.sort_order = Number(sort_order);
+            if (status !== undefined) updateData.status = status;
             updateData.updated_at = new Date();
-
-            await BrandModel
-                .table()
-                .where("id", id)
-                .update(updateData);
-
-            const updatedBrand = await BrandModel
-                .table()
-                .where("id", id)
-                .first();
-
-            /**
-             * Create activity log.
-             */
-            await ActivityLogsModel
-                .table()
-                .insert({
-                    user_id: req.user?.id ?? null,
-                    action: "updated",
-                    subject_type: "Brand",
-                    subject_id: id,
-                    description: `Brand "${updatedBrand?.name}" updated successfully`,
-                    old_values: JSON.stringify(brand),
-                    new_values: JSON.stringify(updatedBrand),
-                    ip_address: req.ip,
-                    user_agent: req.get("user-agent") ?? null,
+            await BrandModel.table().where("id", id).update(updateData);
+            const updatedBrand = await BrandModel.find(Number(id));
+            if (!updatedBrand) {
+                return res._error(STATUS.NOT_FOUND, "Updated brand not found");
+            }
+            brandCache.set(updatedBrand);
+            // file upload
+            const file = req.file;
+            if (file) {
+                const imageProcessing = new Worker(workerPath, {
+                    workerData: {
+                        inputPath: req.file?.buffer,
+                        label: true,
+                        outputPath: multer.path.upload()
+                    }
+                })
+                imageProcessing.on('message', async (result) => {
+                    if (result.success) {
+                        await BrandModel.table().where({ id: id }).update({ logo: result.name })
+                        const sliderx = await BrandModel.find(Number(id));
+                        sliderx.logo = result.name;
+                        brandCache.set(sliderx);
+                    }
                 });
+            }
 
-            return res
-                .status(STATUS.OK)
-                .json(
-                    _success({
-                        message: "Brand updated successfully",
-                        data: updatedBrand,
-                    })
-                );
-
+            const send = BrandModel.clientresponce([updatedBrand]);
+            return res._success(STATUS.OK, "Brand updated successfully", send);
         } catch (error) {
-            return res
-                .status(STATUS.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
+            return res._error(
+                STATUS.INTERNAL_SERVER_ERROR,
+                error instanceof Error ? error.message : String(error)
+            );
         }
     };
-
-    /**
-     * Delete a brand.
-     *
-     * A brand should not be deleted when:
-     * - It is already being used by products.
-     */
     destroy = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-
-            const brand = await BrandModel
-                .table()
-                .where("id", id)
-                .whereNull("deleted_at")
-                .first();
-
-            if (!brand) {
-                return res
-                    .status(STATUS.NOT_FOUND)
-                    .json(
-                        _error({
-                            message: "Brand not found",
-                        })
-                    );
+            if (empty(id)) {
+                return res._error(STATUS.BAD_REQUEST, "ID is required");
             }
-
-            /**
-             * Product check can be enabled when
-             * ProductModel is available.
-             *
-             * Example:
-             *
-             * const product = await ProductModel
-             *     .table()
-             *     .where("brand_id", id)
-             *     .first();
-             *
-             * if (product) {
-             *     return res
-             *         .status(STATUS.CONFLICT)
-             *         .json(
-             *             _error({
-             *                 message:
-             *                     "This brand cannot be deleted because products are assigned to it",
-             *             })
-             *         );
-             * }
-             */
-
-            await BrandModel
-                .table()
-                .where("id", id)
-                .update({
-                    deleted_at: new Date(),
-                    updated_at: new Date(),
-                });
-
-            /**
-             * Create activity log.
-             */
-            await ActivityLogsModel
-                .table()
-                .insert({
-                    user_id: req.user?.id ?? null,
-                    action: "deleted",
-                    subject_type: "Brand",
-                    subject_id: id,
-                    description: `Brand "${brand.name}" deleted successfully`,
-                    old_values: JSON.stringify(brand),
-                    new_values: null,
-                    ip_address: req.ip,
-                    user_agent: req.get("user-agent") ?? null,
-                });
-
-            return res
-                .status(STATUS.OK)
-                .json(
-                    _success({
-                        message: "Brand deleted successfully",
-                    })
-                );
-
+            const brand = await BrandModel.find(Number(id));
+            if (!brand) {
+                return res._error(STATUS.NOT_FOUND, "Brand not found");
+            }
+            await BrandModel.table().where("id", id).update({
+                deleted_at: new Date(),
+                updated_at: new Date(),
+            });
+            brandCache.delete(Number(id));
+            return res._success(STATUS.OK, "Brand deleted successfully", null);
         } catch (error) {
-            return res
-                .status(STATUS.INTERNAL_SERVER_ERROR)
-                .json(
-                    _error({
-                        message: "Something went wrong",
-                        data:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
-                    })
-                );
+            return res._error(
+                STATUS.INTERNAL_SERVER_ERROR,
+                error instanceof Error ? error.message : String(error)
+            );
         }
     };
-
-})();
+};

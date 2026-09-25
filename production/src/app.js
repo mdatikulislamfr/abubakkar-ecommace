@@ -1,0 +1,61 @@
+// Import route definitions
+import helmet from "helmet";
+import web from '../routes/web.route.js';
+import api from '../routes/api.route.js';
+import { Application } from 'express-application-framework';
+// Import application configuration
+import appConfig from '../config/app.js';
+// Import CORS configuration
+import corsConfig from '../config/cors.js';
+import reqMiddleware from '../app/Http/Middleware/req.middleware.js';
+import path from 'node:path';
+import express from 'express';
+/**
+ * Application Entry Point
+ *
+ * Initializes the Express application with:
+ * - Configuration from config/app.ts
+ * - CORS settings from config/cors.ts
+ * - Database configuration from config/database.ts
+ * - Web and API route handlers
+ * - Request size limits and port settings
+ */
+const activaryUrl = new Map();
+export default Application({
+    root: process.cwd(),
+    config: {
+        jsonLimit: appConfig.request.jsonLimit,
+        urlencodedLimit: appConfig.request.urlencodedLimit
+    },
+    port: appConfig.server.port,
+    cors: corsConfig,
+    callback(app) {
+        app.use(helmet({
+            crossOriginResourcePolicy: {
+                policy: "cross-origin",
+            },
+        }));
+        app.set("view engine", "ejs");
+        app.set("views", path.join(process.cwd(), "resources/views"));
+        app.use(express.static(path.join(process.cwd(), 'storage/uploads')));
+        app.use("/", (req, _, next) => {
+            const url = req.url;
+            const existing = activaryUrl.get(url);
+            if (existing) {
+                existing.count++;
+            }
+            else {
+                activaryUrl.set(url, { url, count: 1 });
+            }
+            // console.log(activaryUrl);
+            next();
+        });
+        app.use(reqMiddleware);
+        // Mount API routes under /api prefix
+        app.use("/api", api);
+        // Mount web routes at root path
+        app.use("/", web);
+        return app;
+    },
+});
+//# sourceMappingURL=app.js.map

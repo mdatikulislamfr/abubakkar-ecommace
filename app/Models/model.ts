@@ -37,6 +37,9 @@ export class baseModel extends model {
     // - protected casts: Record<string, string> (attribute type casting)
     // - protected timestamps: boolean (auto manage timestamps)
 
-    static find(id: number) { return this.table().where(this.primaryKey, "=", id).first() };
-    
+    static find(id: number) {
+        return this.table().where(this.primaryKey, "=", id).first();
+    };
+    static cacheInitialize(): void { }
+
 }

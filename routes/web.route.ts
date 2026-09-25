@@ -1,5 +1,4 @@
 import Route from "express-route-framework";
-
-Route.get("/", (_, res) => res.send("web"));
-
+import SeoController from "../app/Http/Controllers/Seo.Controller.js";
+Route.get("/sitemap.xml",SeoController.sitemap);
 export default Route.getRouter();

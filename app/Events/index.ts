@@ -1,2 +1,2 @@
 import { EventEmitter } from 'events'
-export const caseEvent = new EventEmitter();
+export const imageUpload = new EventEmitter();

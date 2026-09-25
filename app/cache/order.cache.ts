@@ -18,13 +18,6 @@ class OrderCache extends BaseCache<Order> {
         this.casePhone.clear();
         data.forEach((order) => {
 
-            if (order.order_number) {
-                this.caseOrderNumber.set(
-                    order.order_number,
-                    order
-                );
-            }
-
             if (order.customer_phone) {
                 this.casePhone.set(
                     order.customer_phone,
@@ -40,12 +33,6 @@ class OrderCache extends BaseCache<Order> {
      */
     set(data: Order): void {
         super.set(data);
-        if (data.order_number) {
-            this.caseOrderNumber.set(
-                data.order_number,
-                data
-            );
-        }
         if (data.customer_phone) {
             this.casePhone.set(
                 data.customer_phone,
@@ -77,11 +64,7 @@ class OrderCache extends BaseCache<Order> {
 
         if (order) {
 
-            if (order.order_number) {
-                this.caseOrderNumber.delete(
-                    order.order_number
-                );
-            }
+           
 
             if (order.customer_phone) {
                 this.casePhone.delete(

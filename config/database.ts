@@ -30,15 +30,12 @@ export default {
             charset: 'utf8mb4',
             collation: 'utf8mb4_unicode_ci',
             timezone: process.env.DB_TIMEZONE || 'UTC',
-
             // Connection pool settings
             connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
             waitForConnections: true,
             queueLimit: 0,
-
             // Enable query logging
             debug: process.env.DB_DEBUG === 'true',
-
             // SSL configuration for MySQL
             ssl: process.env.DB_SSL === 'true'
                 ? {

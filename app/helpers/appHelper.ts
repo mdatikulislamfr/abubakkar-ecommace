@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid'
 import { ResponceType } from '../../@types/index.js';
+
 /* ------------------ helpers ------------------ */
 const randomItem = (arr: string[] | number[]) => arr[Math.floor(Math.random() * arr.length)];
 const randomNumber = (min: number, max: number) =>
@@ -73,8 +74,24 @@ function _error<T>(data: ResponceType<T>): ResponceType<T> {
 function _success<T>(data: ResponceType<T>): ResponceType<T> {
     return { error: false, message: data.message, data: data.data }
 }
+function empty<T>(value: T): boolean {
+    if (value === null || value === undefined) {
+        return true;
+    }
+    if (typeof value === "string") {
+        return value.trim() === "";
+    }
+    if (Array.isArray(value)) {
+        return value.length === 0;
+    }
+    return false;
+}
+
+
+
 /* ------------------ Export ------------------ */
 export {
+    empty,
     fakeId,
     fakeEmail,
     fakePassword,
