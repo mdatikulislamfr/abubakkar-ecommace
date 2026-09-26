@@ -19,11 +19,6 @@ const distPath = path.join(__dirname, 'dist');
 if (fs.existsSync(distPath)) {
     const distItems = fs.readdirSync(distPath);
     distItems.forEach((item) => {
-        // 'database' ফোল্ডারটি ইগনোর করা হচ্ছে
-        if (item === 'database') {
-            console.log(`🚫 Ignored: ${item} (from dist)`);
-            return;
-        }
         const src = path.join(distPath, item);
         const dest = path.join(__dirname, targetFolder, item);
         fs.cpSync(src, dest, { recursive: true });

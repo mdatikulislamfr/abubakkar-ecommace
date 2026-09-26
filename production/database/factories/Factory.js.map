@@ -1,0 +1,1 @@
+{"version":3,"file":"Factory.js","sourceRoot":"","sources":["../../../database/factories/Factory.ts"],"names":[],"mappings":"AAAA,MAAM,OAAgB,OAAO;IAGzB,IAAI;QACA,OAAO,IAAI,CAAC,UAAU,EAAE,CAAC;IAC7B,CAAC;IAED,QAAQ,CAAC,KAAa;QAClB,OAAO,KAAK,CAAC,IAAI,CACb,EAAE,MAAM,EAAE,KAAK,EAAE,EACjB,GAAG,EAAE,CAAC,IAAI,CAAC,IAAI,EAAE,CACpB,CAAC;IACN,CAAC;CACJ"}

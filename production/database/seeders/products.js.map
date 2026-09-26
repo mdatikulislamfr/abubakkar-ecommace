@@ -1,0 +1,1 @@
+{"version":3,"file":"products.js","sourceRoot":"","sources":["../../../database/seeders/products.ts"],"names":[],"mappings":"AAGA,MAAM,CAAC,KAAK,UAAU,IAAI,CAAC,IAAU;IACjC,oCAAoC;IACpC,MAAM,IAAI,CAAC,UAAU,CAAC,CAAC,GAAG,EAAE,CAAC;IAC7B,MAAM,QAAQ,GAAc,EAAE,CAAA;IAC9B,uCAAuC;IACvC,MAAM,IAAI,CAAC,UAAU,CAAC,CAAC,MAAM,CAAC,QAAQ,CAAC,CAAC;AAC5C,CAAC"}
