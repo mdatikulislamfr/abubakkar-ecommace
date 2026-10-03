@@ -1,0 +1,1 @@
+{"version":3,"file":"brand.model.d.ts","sourceRoot":"","sources":["../../../app/Models/brand.model.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,uBAAuB,CAAC;AAG9C,OAAO,EAAE,SAAS,EAAE,MAAM,YAAY,CAAC;AAEvC,qBAAa,UAAW,SAAQ,SAAS;IAEpC,MAAM,CAAC,SAAS,EAAE,MAAM,CAAY;IACpC,OAAa,eAAe,kBAO3B;IACD,MAAM,CAAC,cAAc,CAAC,KAAK,EAAE,KAAK,EAAE,GAAG,KAAK,EAAE,CAO7C;CACL"}
